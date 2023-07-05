@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<resources>
+    <string name="hello">Blade starting now</string>
+    <string name="app_name">DroidBLaDE</string>
+    <string name="web_lookup_off">Product Lookup Off</string>
+    <string name="web_lookup_on">Product Lookup On</string>
+    <string name="audio_fb_off">Audio Feedback Off</string>
+    <string name="audio_fb_on">Audio Feedback On</string>
+    <string name="barcode_lookup">Looking up barcode</string>
+    <string name="barcode_found">Detected barcode</string>
+    <string name="horiz_fb_off">Horizontal Feedback Off</string>
+    <string name="bc_decoding_off">Barcode Decoding Off</string>
+    <string name="bc_decoding_on">Barcode Decoding On</string>
+    <string name="horiz_fb_on">Horizontal Feedback On</string>
+    <string name="google_api_key"></string>
+</resources>

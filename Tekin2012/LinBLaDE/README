@@ -1,0 +1,6 @@
+LinBLaDE is a linux application that uses the BLaDE library. LinBLaDE relies on OpenCV for input/output functions, and thus needs BLaDE to be compiled with OpenCV support, as well as having the OpenCV libraries installed.
+
+The application uses Alsa libraries to provide real-time audio feedback when using a webcam to help localize a barcode, and espeak to provide text-to-speech output.
+
+For more information, run LinBLaDE -h to see a list of command line options
+

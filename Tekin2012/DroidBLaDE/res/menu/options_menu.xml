@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/audio_fb" android:title="@string/audio_fb_off" android:checkable="true" android:checked="true" android:visible="true" android:enabled="true"></item>
+    <item android:id="@+id/web_lookup" android:title="@string/web_lookup_off" android:checked="true" android:checkable="true" android:visible="true" android:enabled="true"></item>
+    <item android:id="@+id/bc_decoding" android:title="@string/bc_decoding_off" android:checkable="true" android:checked="true" android:enabled="true" android:visible="true"></item>
+    <item android:id="@+id/horiz_fb" android:title="@string/horiz_fb_on" android:checkable="true" android:checked="true" android:enabled="true" android:visible="true"></item>
+</menu>

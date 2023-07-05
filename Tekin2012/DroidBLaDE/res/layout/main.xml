@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:weightSum="1">
+    <SurfaceView
+		android:id="@+id/preview" 
+		android:layout_width="fill_parent" 
+		android:layout_height="fill_parent"/>
+	<ski.blade.OverlayView 
+		android:id="@+id/overlay"
+		android:layout_width="fill_parent"
+		android:layout_height="fill_parent"
+        android:background="#AA000000"/>
+    	<TextView
+		android:id="@+id/textUPC"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="70dip"
+        android:layout_gravity="center_horizontal|bottom"
+        android:padding="12dip"
+        android:background="#AA000000"
+        android:textColor="#ffffffff"/>
+	<TextView
+		android:id="@+id/textInfo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="20dip"
+        android:layout_gravity="center_horizontal|bottom"
+        android:padding="12dip"
+        android:background="#AA000000"
+        android:textColor="#ffffffff"/>
+</FrameLayout>

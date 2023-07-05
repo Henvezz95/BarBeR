@@ -1,0 +1,5 @@
+Barcode Localization and Decoding Engine
+
+This directory contains the files necessary to compile BLaDE. BLaDE can be compiled as a shared library and used in your own projects (see LinBLaDE for example). If you pass the USE_OPENCV compilation flag, BLaDE will need the OpenCV libraries to work. If your project already uses OpenCV, this should result in a smaller library (again, see LinBLaDE for an example).
+
+If you use eclipse, you can simply import BLaDE as a project. BLaDE will also require the public header files in /include, you can simply put this in the same workspace directory as BLaDE. There are four targets defined: Release and Debug with and without OpenCV support.

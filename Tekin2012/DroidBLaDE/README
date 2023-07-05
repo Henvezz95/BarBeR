@@ -1,0 +1,7 @@
+DroidBLaDE is an Android client for BLaDE.
+
+Compilation:
+Both Android SDK and NDK (>=8) are needed. NDK is used to compile the BLaDE library, and requires at least gcc4.6, as it uses some c++11 features.
+
+If you have the NDK plugin that is included with ADT >20, things should go fine. All the files necessary to import DroidBLaDE as an Eclipse project are included. DroidBLaDE also needs the common header files found in /include as well as the source files in BLaDE/src (an Android.mk file is also in that directory to compile BLaDE as a shared library).
+
