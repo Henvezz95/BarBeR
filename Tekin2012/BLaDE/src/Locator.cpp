@@ -263,11 +263,22 @@ bool BarcodeLocator::scanSegment(BarcodeCandidate &aBC, const TPointInt &pt)
 		TPointInt lastEdge;
 		if (dir == 1)
 			step *= -1.0;
+
 		while (imageRect.contains(curPt)) //TODO: ensure that pt is contained in imageRect and avoid check
 		{
 			curPt += step;
+
+			//if (curPt.y < 0){
+			//	curPt.y=0;
+			//bool var = imageRect.contains(curPt);
+			//}
+			bool var = imageRect.contains(curPt); //Evezzali: this check avoids unwanted errors
+			if (var == false){
+				break;
+			}
 			if (magnitude(curPt))
 			{
+
 				if (isAcceptable[orientation(curPt)])	//correctly oriented edge - increase count and reset distance
 				{
 					lastEdge = curPt;
