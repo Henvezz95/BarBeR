@@ -6,6 +6,7 @@ The repository contains multiple algorithms for 1D and 2D barcode localization p
 * Tekin2012
 * Soros2013
 * Zamberletti2013
+* Creusot2016
 * Yun2017
 
 # To Do
