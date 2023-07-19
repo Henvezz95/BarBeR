@@ -9,7 +9,7 @@ int adder(int a, int b){
 void ravel(int* result, std::vector<std::vector<cv::Point>> input){
 	int index = 0;
 	for(int i=0; i<input.size(); i++){
-		for(int j=0; j<4; j++){
+		for(int j=0; j<input[i].size(); j++){
 			result[index]=input[i][j].x;
 			index++;
 			result[index]=input[i][j].y;
@@ -18,7 +18,7 @@ void ravel(int* result, std::vector<std::vector<cv::Point>> input){
 	}
 }
 
-void locateBarcode(int* result, unsigned char* img_color, int h, int w,
+void locateBarcode(int* result, int* num_results, unsigned char* img_color, int h, int w,
 																									int minLineLength,
 																									int support_candidates_threshold,
 																									int delta,
@@ -53,12 +53,7 @@ void locateBarcode(int* result, unsigned char* img_color, int h, int w,
 	std::vector<std::vector<cv::Point>> contours_lineSegments = getLineSegmentsContours(keylines, image_lines, minLineLength);
 	end = std::chrono::steady_clock::now();
 	std::cout << "Creating bounding boxes: " << std::chrono::duration <double, std::milli> (end - start).count() << " ms" << std::endl;
-
-	cv::drawContours(image_lines, contours_lineSegments, -1, cv::Scalar(0, 0, 255));
-
 	std::cout << "Number of bounding boxes: " << contours_lineSegments.size() << std::endl;
-
-	cv::imwrite("debug-line-segments.jpg", image_lines);
 
 	// Find for every bounding box the containing segments
 	std::vector<std::vector<std::shared_ptr<cv::line_descriptor::KeyLine>>> keylinesInContours(contours_lineSegments.size());
@@ -144,27 +139,6 @@ void locateBarcode(int* result, unsigned char* img_color, int h, int w,
 							deletedContours);
 	end = std::chrono::steady_clock::now();
 	std::cout << "Compute phis: " << std::chrono::duration <double, std::milli> (end - start).count() << " ms" << std::endl;
-
-
-	// For debugging
-	// Select a good line segment example
-	/*
-	int index = 0;
-	int nmb = 0;
-	bool finish = false;
-	for(unsigned int i = 0; (i < intensities.size()) && (!finish); i++) {
-		if(0 < intensities[i][3].size()) {
-			nmb++;
-			//if(250 < nmb) {
-			if(290 < nmb) {
-				finish = true;
-				index = i;
-			}
-		}
-	}
-	index = 0;
-	std::cout << "index = " << index << ", size() = " << intensities[index][2].size() << std::endl;
-	*/
 	int index = 0;
 
 	// Calculate bounding boxes
@@ -198,42 +172,11 @@ void locateBarcode(int* result, unsigned char* img_color, int h, int w,
 								 inSegmentXDistance,
 								 inSegmentYDistance);
 
-	cv::drawContours(image_candidates, contours_barcodes, -1, cv::Scalar(255, 0, 0), 1);
-
-	for(int i = 0; i < keylinesInContours_size; i++) {
-		if(false == deletedContours[i]) {
-			cv::putText(image_candidates, std::to_string(i), contours_barcodes[i][0], cv::FONT_HERSHEY_SIMPLEX, 1, cv::Scalar(255, 0, 0));
-		}
-	}
-
-	cv::imwrite("debug-candidate-segments.jpg", image_candidates);
 	end = std::chrono::steady_clock::now();
 	std::cout << "Filtering bounding boxes: " << std::chrono::duration <double, std::milli> (end - start).count() << " ms" << std::endl;
 
-	// barcode decoding with ZBar
-	/*
-	start = std::chrono::steady_clock::now();
-
-	cv::Mat image_barcodes;
-	image_color.copyTo(image_barcodes);
-
-	std::vector<std::string> barcodes = decodeBarcode(keylinesInContours_size, deletedContours, contours_barcodes, image_greyscale, image_barcodes);
-
-  end = std::chrono::steady_clock::now();
-  std::cout << "Barcode decoding: " << std::chrono::duration <double, std::milli> (end - start).count() << " ms" << std::endl;
-
-  std::cout << "Total time: " << std::chrono::duration <double, std::milli> (end - total_start).count() << " ms" << std::endl;
-  */
   ravel(result, contours_barcodes);
-  std::cout<<contours_barcodes.size() << " contours" << std::endl;
-  std::cout<< result[0] << std::endl;
-  std::cout<< result[1] << std::endl;
-  std::cout<< result[2] << std::endl;
-  std::cout<< result[3] << std::endl;
-  std::cout<< result[4] << std::endl;
-  std::cout<< result[5] << std::endl;
-  std::cout<< result[6] << std::endl;
-  std::cout<< result[7] << std::endl;
+  (*num_results) = contours_barcodes.size();
 }
 
 std::vector<std::vector<cv::Point>> getLineSegmentsContours(std::vector<cv::line_descriptor::KeyLine> &keylines,

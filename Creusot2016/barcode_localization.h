@@ -48,7 +48,7 @@ extern "C" DLL_PUBLIC int adder(int a, int b);
  * @param inSegmentYDistance Distance in y-direction for segements within a contour. Used as filter parameter.
  * @return Contours around the barcodes.
  */
-extern "C" DLL_PUBLIC void locateBarcode(int* result, unsigned char* img_color,
+extern "C" DLL_PUBLIC void locateBarcode(int* result, int* num_results, unsigned char* img_color,
 int h, int w,
 																									 int minLineLength,
 																									 int support_candidates_threshold,

@@ -13,9 +13,10 @@ int main() {
     int delta = 5;
     int maxLengthToLineLengthRatio = 6;
     int minLengthToLineLengthRatio = 1;
+    int num_results = 0;
 
     
-    locateBarcode(result, dataindex, img.rows, img.cols, minLineLength, support_candidates_threshold, delta, maxLengthToLineLengthRatio, minLengthToLineLengthRatio, 3,3);
+    locateBarcode(result, &num_results, dataindex, img.rows, img.cols, minLineLength, support_candidates_threshold, delta, maxLengthToLineLengthRatio, minLengthToLineLengthRatio, 3,3);
     std::cout <<result[0]<<std::endl;
 
 }
