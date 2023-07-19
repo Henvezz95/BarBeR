@@ -9,12 +9,11 @@ The repository contains multiple algorithms for 1D and 2D barcode localization p
 * Creusot2016
 * Yun2017
 
-# To Do
-* Python interface still absent
 
-# Still Missing methods
+# To DO
 * Zharkov2019 (python)
 * Katona2013 (c++, still unsure if it works)
 * Wang2022 (python)
 * Chou2015 (only Neural-Network available in Matlab .mat format)
 * Blanger2019 (ask form at https://github.com/ImageU/QR_codes_dataset/blob/master/qr_codes_eula.pdf)
+* General networks test (YOLO and others)
