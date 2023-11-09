@@ -1,0 +1,6 @@
+project(Barcode_Localization_Benchmark)
+
+add_subdirectory(Gallo2011-Soros2013-Yun2017)
+add_subdirectory(Tekin2012)
+add_subdirectory(Zamberletti2013)
+add_subdirectory(Creusot2016)
