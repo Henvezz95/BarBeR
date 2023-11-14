@@ -1,0 +1,8 @@
+{
+    "train_val_test_split": [0.6, 0.1, 0.3],
+    "vgg_annotations_path": "./annotations/VIA/",
+    "annotation_files": [],
+    "output_path": "./annotations/COCO/",
+    "images_path": "./dataset/images/",
+    "salt": ""
+}
