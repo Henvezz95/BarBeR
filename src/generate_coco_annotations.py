@@ -162,9 +162,41 @@ for img_path in img_paths:
         val_files.append(img_path) 
     else:
         test_files.append(img_path)
+
 print('Train Images: '+str(len(train_files)), 
       'Validation Images: '+str(len(val_files)),
       'Test Images: '+str(len(test_files)))
+
+datasets_dictionary = {
+    'datasets' : {},
+    'images' : {}
+}
+for json_path in annotations:
+    datasets_dictionary['datasets'][os.path.basename(json_path).split('.')[0]] = json_path
+
+for json_path in annotations:
+    ann = json.load(open(json_path))['_via_img_metadata']
+    for key in ann:
+        file_name = ann[key]['filename']
+        path = annotations_config['images_path'] + file_name
+        dataset_name = os.path.basename(json_path).split('.')[0]
+        if path in train_files:
+            split = 'train'
+        elif path in val_files:
+            split = 'val'
+        elif path in test_files:
+            split = 'test'
+        else:
+            continue
+        datasets_dictionary['images'][file_name] = {
+            'dataset': dataset_name,
+            'split': split,
+            'path': path
+        }
+
+with open(output_path + 'datasets_info.json', "w") as outfile: 
+    json.dump(datasets_dictionary, outfile, indent=2)
+
 
 coco_train = convert_all(train_files, annotations)
 with open(output_path + 'train.json', "w") as outfile: 
