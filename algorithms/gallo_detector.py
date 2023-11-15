@@ -1,7 +1,7 @@
 from ctypes import *
 import numpy as np
 
-class gallo_detector:
+class Gallo_detector:
     def __init__(self, lib_path, winsize=20, max_rois=50):
         self.lib_path = lib_path
         self.winsize = winsize
@@ -12,9 +12,9 @@ class gallo_detector:
         h, w, _ = img.shape
         h,w = c_short(h), c_short(w)
         input_img = img.ctypes.data_as(POINTER(c_uint8))
-        result = (c_int*8)()
+        result = (c_int*4)()
 
         self.cdll.galloProcess(result, input_img, h,w, c_int(self.winsize));
-        result = np.array(result)[:8].reshape((4, 2))
+        result = np.array(result)
         return [result], ['1D'], None #Boxes, classes, confidence scores
 
