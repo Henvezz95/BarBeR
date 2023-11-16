@@ -1,4 +1,6 @@
 import math
+import numpy as np
+import cv2
 
 
 class Point():
@@ -63,3 +65,21 @@ def get_segmenation(coord_x, coord_y):
     for x, y in zip(coord_x, coord_y):
         seg.extend((x, y))
     return [seg]   
+
+def box_to_poly(box):
+    if len(box) == 0:
+        return []
+    x,y,w,h = box
+    return np.array([[x,y],[x+w,y],[x+w,y+h],[x,y+h]])
+
+def compute_1D_coverage(prediction, true_polygon):
+    if len(prediction) == 0:
+        return 0
+    contours = np.float32(np.array([true_polygon[0], true_polygon[1], true_polygon[2], true_polygon[3]]))
+    pts = np.float32([[0, 1], [0, 0], [1, 0], [1, 1]])
+    M = cv2.getPerspectiveTransform(contours, pts)
+
+    transformed_prediction = cv2.perspectiveTransform(np.float32(prediction).reshape(-1,1,2),M)
+    minX = np.min(transformed_prediction[:,0])
+    maxX = np.max(transformed_prediction[:,0])
+    return np.clip(maxX,0,1)-np.clip(minX,0,1)

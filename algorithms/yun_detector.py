@@ -16,6 +16,7 @@ class Yun_detector:
         num_results = (c_int*1)()
 
         self.cdll.yunProcess(result, num_results, input_img, h,w);
+        result = np.array(result).ravel()
         result = np.array(result)[:num_results[0]*4].reshape((-1,4))
         return result, ['1D']*len(result), None #Boxes, classes, confidence scores
 
