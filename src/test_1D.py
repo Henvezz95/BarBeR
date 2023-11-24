@@ -27,6 +27,7 @@ with open('./annotations/COCO/datasets_info.json') as json_file:
 
 ann_index = 0
 image_counter = 0
+minimum_area = 0
 total_area = 0
 Gallo_results = [0,0,0]
 Zamberletti_results = [0,0,0]
@@ -65,12 +66,14 @@ for image_annotation in tqdm(coco_annotations['images']):
         H_new = longest_edge_resize
         W_new = int(np.round((W*H_new)/H))
 
+    total_area += (W_new*H_new)/1000000
+
     for i in range(len(true_boxes)):
         true_boxes[i][0::2] = np.int32(np.round(W_new*true_boxes[i][0::2]/W))
-        true_boxes[i][1::2] = np.int32(np.round(H_new*true_boxes[i][0::2]/H))
+        true_boxes[i][1::2] = np.int32(np.round(H_new*true_boxes[i][1::2]/H))
         true_polygons[i][:,0] = np.int32(np.round(W_new*true_polygons[i][:,0]/W))
         true_polygons[i][:,1] = np.int32(np.round(H_new*true_polygons[i][:,1]/H))
-        total_area += (true_boxes[i][-2]* true_boxes[i][-1])/1000000 
+        minimum_area += (true_boxes[i][-2]* true_boxes[i][-1])/1000000 
     
     img = cv2.resize(img, (W_new, H_new), cv2.INTER_CUBIC)
     boxes, classes, confidences = gallo_detector.detect(img)
@@ -115,7 +118,7 @@ for image_annotation in tqdm(coco_annotations['images']):
     else:
         Yun_results[1]+=1
 
-print(image_counter, total_area)
+print(image_counter, total_area, minimum_area)
 print('Gallo: ', Gallo_results)
 print('Zamberletti: ', Zamberletti_results)
 print('Yun: ', Yun_results)
