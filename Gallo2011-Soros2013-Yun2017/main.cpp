@@ -44,7 +44,7 @@ int main(int argc, char* argv[])
 	cv::Rect g_rt = mGallo.process(frame_gray, 20);
 	cv::rectangle(frame, g_rt, cv::Scalar(0, 255, 0), 2);
 
-	cv::Rect s_rt = mSoros.process(frame_gray, 20);
+	cv::Rect s_rt = mSoros.process(frame_gray, true, 20);
 	cv::rectangle(frame, s_rt, cv::Scalar(255,0,0), 2);
 
 	std::vector<iy::YunCandidate> list_barcode = mYun.process(frame_gray);

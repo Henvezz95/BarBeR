@@ -17,35 +17,43 @@
 
 using namespace iy;
 
+
+
 cv::Rect Soros::process(cv::Mat &gray_src, bool is1D /*= true*/, int WinSz /*= 20*/)
+
 {
+
     cv::Rect result(0,0,0,0);
+
     
+
     try{
+
        // saliency map
        cv::Mat saliency = SaliencyMapbyAndoMatrix(gray_src, is1D);
-       
+
        // integral map
        cv::Mat iMap = calc_integral_image(saliency);
-       
+
        // find max point with box filter
        cv::Mat sMap(saliency.size(), CV_8UC1); 
        cv::Point cp = find_max_point_with_smooth(iMap, sMap, WinSz);
-    
+
+
        // global binzrization
        cv::Mat bMap(saliency.size(), CV_8UC1);
        cv::threshold(sMap, bMap, 50, 255, cv::THRESH_OTSU);
+
        
        // box detection       
        result = box_detection(bMap, cp);
+
     }
     catch(cv::Exception &e)
     {
         std::cerr << "cv::Exception: " << std::endl;
         std::cerr << e.what() << std::endl;
     }
-    
-    // return result
     return result;
 }
 
