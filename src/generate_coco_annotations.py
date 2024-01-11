@@ -2,7 +2,7 @@ import json
 import cv2
 import hashlib
 import os
-from utils import GetAreaOfPolyGon, get_segmenation
+from utility import GetAreaOfPolyGon, get_segmenation
 import datetime
 from tqdm import tqdm
 from glob import glob
@@ -136,7 +136,17 @@ with open(config_file_path) as json_file:
 vgg_annotations_basepath = annotations_config['vgg_annotations_path']
 img_paths = glob(annotations_config['images_path']+'*.[jJ][pP][gGeE]*')
 output_path = annotations_config['output_path']
-train_val_test_split = annotations_config['train_val_test_split']
+if 'k_folds' in annotations_config and annotations_config['k_folds']>1:
+    k_folds = annotations_config['k_folds']
+    if annotations_config['validation']:
+        train_val_test_split =  [(k_folds-2)/(k_folds), 1/k_folds, 1/k_folds]
+    else:
+        train_val_test_split =  [(k_folds-1)/(k_folds), 0, 1/k_folds]
+    fold_index = annotations_config['fold_index']
+else:
+    k_folds = 1
+    fold_index = 0
+    train_val_test_split = annotations_config['train_val_test_split']
 salt = annotations_config['salt']
 
 if len(annotations_config['annotation_files']) == 0:
@@ -155,7 +165,8 @@ test_files = []
 
 for img_path in img_paths:
     file_name = os.path.basename(img_path)
-    hash_code = int(hashlib.sha256(((file_name+salt).encode('utf-8'))).hexdigest(), 16) % 10 ** 4
+    hash_code = int(hashlib.sha256(((file_name+salt).encode('utf-8'))).hexdigest(), 16) 
+    hash_code = int((int(hash_code % 10 ** 4)+(10 ** 4)*(fold_index/k_folds))% 10 ** 4)
     if hash_code < th1 * (10 ** 4):
         train_files.append(img_path)
     elif hash_code < th2 * (10 ** 4):
@@ -191,7 +202,8 @@ for json_path in annotations:
         datasets_dictionary['images'][file_name] = {
             'dataset': dataset_name,
             'split': split,
-            'path': path
+            'path': path,
+            'key': key
         }
 
 with open(output_path + 'datasets_info.json', "w") as outfile: 

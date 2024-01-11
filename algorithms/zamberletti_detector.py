@@ -10,7 +10,7 @@ class Zamberletti_detector:
         self.cdll =  cdll.LoadLibrary(self.lib_path)
         self.cdll.initialize(net_path.encode('utf-8'))
 
-    def detect_polygon(self, img):
+    def detect_polygons(self, img):
         h, w, _ = img.shape
         h,w = c_short(h), c_short(w)
         input_img = img.ctypes.data_as(POINTER(c_uint8))
@@ -31,7 +31,7 @@ class Zamberletti_detector:
         return result, ['1D']*len(result), None #Polygons, classes, confidence scores
 
     def detect(self, img):
-        polygons, classes, _ = self.detect_polygon(img)
+        polygons, classes, _ = self.detect_polygons(img)
         result = []
         for poly in polygons:
             result.append(cv2.boundingRect(poly))
