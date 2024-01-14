@@ -22,10 +22,169 @@
 from collections import defaultdict
 
 import numpy as np
-from src.bounding_box import BBFormat
-
+from bounding_box import BBFormat
 
 def get_coco_summary(groundtruth_bbs, detected_bbs):
+    """Calculate the 12 standard metrics used in COCOEval,
+        AP, AP50, AP75,
+        AR1, AR10, AR100,
+        APsmall, APmedium, APlarge,
+        ARsmall, ARmedium, ARlarge.
+
+        When no ground-truth can be associated with a particular class (NPOS == 0),
+        that class is removed from the average calculation.
+        If for a given calculation, no metrics whatsoever are available, returns NaN.
+
+    Parameters
+        ----------
+            groundtruth_bbs : list
+                A list containing objects of type BoundingBox representing the ground-truth bounding boxes.
+            detected_bbs : list
+                A list containing objects of type BoundingBox representing the detected bounding boxes.
+    Returns:
+            A dictionary with one entry for each metric.
+    """
+
+    # separate bbs per image X class
+    _bbs = _group_detections(detected_bbs, groundtruth_bbs)
+
+    # pairwise ious
+    _ious = {k: _compute_ious(**v) for k, v in _bbs.items()}
+
+    def _evaluate(iou_threshold, max_dets, area_range):
+        # accumulate evaluations on a per-class basis
+        _evals = defaultdict(lambda: {"scores": [], "matched": [], "NP": []})
+        for img_id, class_id in _bbs:
+            ev = _evaluate_image(
+                _bbs[img_id, class_id]["dt"],
+                _bbs[img_id, class_id]["gt"],
+                _ious[img_id, class_id],
+                iou_threshold,
+                max_dets,
+                area_range,
+            )
+            acc = _evals[class_id]
+            acc["scores"].append(ev["scores"])
+            acc["matched"].append(ev["matched"])
+            acc["NP"].append(ev["NP"])
+
+        # now reduce accumulations
+        for class_id in _evals:
+            acc = _evals[class_id]
+            acc["scores"] = np.concatenate(acc["scores"])
+            acc["matched"] = np.concatenate(acc["matched"]).astype('bool')
+            acc["NP"] = np.sum(acc["NP"])
+
+        res = []
+        # run ap calculation per-class
+        for class_id in _evals:
+            ev = _evals[class_id]
+            res.append({
+                "class": class_id,
+                **_compute_ap_recall(ev["scores"], ev["matched"], ev["NP"]),
+            })
+        return res
+
+    iou_thresholds = np.linspace(0.5, 0.95, int(np.round((0.95 - 0.5) / 0.05)) + 1, endpoint=True)
+
+    # compute simple AP with all thresholds, using up to 100 dets, and all areas
+    full = {
+        i: _evaluate(iou_threshold=i, max_dets=100, area_range=(0, np.inf))
+        for i in iou_thresholds
+    }
+
+    AP50 = np.mean([x['AP'] for x in full[0.50] if x['AP'] is not None])
+    AP75 = np.mean([x['AP'] for x in full[0.75] if x['AP'] is not None])
+    AP = np.mean([x['AP'] for k in full for x in full[k] if x['AP'] is not None])
+
+    TP50 = np.sum([x['TP'] for x in full[0.50] if x['AP'] is not None])
+    FP50 = np.sum([x['FP'] for x in full[0.50] if x['AP'] is not None])
+    FN50 = np.sum([x['total positives']-x['TP'] for x in full[0.50] if x['AP'] is not None])
+    TP75 = np.sum([x['TP'] for x in full[0.75] if x['AP'] is not None])
+    FP75 = np.sum([x['FP'] for x in full[0.75] if x['AP'] is not None])
+    FN75 = np.sum([x['total positives']-x['TP'] for x in full[0.75] if x['AP'] is not None])
+
+    P = np.sum([x['total positives'] for x in full[0.75] if x['AP'] is not None])
+
+    # max recall for 100 dets can also be calculated here
+    AR100 = np.mean(
+        [x['TP'] / x['total positives'] for k in full for x in full[k] if x['TP'] is not None])
+
+    small = {
+        i: _evaluate(iou_threshold=i, max_dets=100, area_range=(0, 32**2))
+        for i in iou_thresholds
+    }
+    APsmall = [x['AP'] for k in small for x in small[k] if x['AP'] is not None]
+    APsmall = np.nan if APsmall == [] else np.mean(APsmall)
+    ARsmall = [
+        x['TP'] / x['total positives'] for k in small for x in small[k] if x['TP'] is not None
+    ]
+    ARsmall = np.nan if ARsmall == [] else np.mean(ARsmall)
+
+    medium = {
+        i: _evaluate(iou_threshold=i, max_dets=100, area_range=(32**2, 96**2))
+        for i in iou_thresholds
+    }
+    APmedium = [x['AP'] for k in medium for x in medium[k] if x['AP'] is not None]
+    APmedium = np.nan if APmedium == [] else np.mean(APmedium)
+    ARmedium = [
+        x['TP'] / x['total positives'] for k in medium for x in medium[k] if x['TP'] is not None
+    ]
+    ARmedium = np.nan if ARmedium == [] else np.mean(ARmedium)
+
+    large = {
+        i: _evaluate(iou_threshold=i, max_dets=100, area_range=(96**2, np.inf))
+        for i in iou_thresholds
+    }
+    APlarge = [x['AP'] for k in large for x in large[k] if x['AP'] is not None]
+    APlarge = np.nan if APlarge == [] else np.mean(APlarge)
+    ARlarge = [
+        x['TP'] / x['total positives'] for k in large for x in large[k] if x['TP'] is not None
+    ]
+    ARlarge = np.nan if ARlarge == [] else np.mean(ARlarge)
+
+    max_det1 = {
+        i: _evaluate(iou_threshold=i, max_dets=1, area_range=(0, np.inf))
+        for i in iou_thresholds
+    }
+    AR1 = np.mean([
+        x['TP'] / x['total positives'] for k in max_det1 for x in max_det1[k] if x['TP'] is not None
+    ])
+
+    max_det10 = {
+        i: _evaluate(iou_threshold=i, max_dets=10, area_range=(0, np.inf))
+        for i in iou_thresholds
+    }
+    AR10 = np.mean([
+        x['TP'] / x['total positives'] for k in max_det10 for x in max_det10[k]
+        if x['TP'] is not None
+    ])
+
+    return {
+        "AP": AP,
+        "AP50": AP50,
+        "AP75": AP75,
+        "TP50": TP50,
+        "FP50": FP50,
+        "FN50": FN50,
+        "TP75": TP75,
+        "FP75": FP75,
+        "FN75": FN75,
+        "P":P,
+        "APsmall": APsmall,
+        "APmedium": APmedium,
+        "APlarge": APlarge,
+        "AR1": AR1,
+        "AR10": AR10,
+        "AR100": AR100,
+        "ARsmall": ARsmall,
+        "ARmedium": ARmedium,
+        "ARlarge": ARlarge
+    }
+
+
+
+def get_coco_summary2(groundtruth_bbs, detected_bbs):
     """Calculate the 12 standard metrics used in COCOEval,
         AP, AP50, AP75,
         AR1, AR10, AR100,
@@ -101,19 +260,23 @@ def get_coco_summary(groundtruth_bbs, detected_bbs):
     for class_id in range(len(full50)):
         AP50 = full50[class_id]['AP']
         AP75 = full75[class_id]['AP']
-        AP = np.mean([full[k][class_id]['AP'] for k in full if full[k][class_id] is not None])
+        AP = [full[k][class_id]['AP'] for k in full if full[k][class_id] is not None]
+        if AP is not None and len(AP)>0:
+            AP = np.mean(AP)
 
         TP50 = full50[class_id]['TP']
         FP50 = full50[class_id]['FP']
         FN50 = full50[class_id]['total positives'] - full50[class_id]['TP']
         TP75 = full75[class_id]['TP']
         FP75 = full75[class_id]['FP']
-        FN75 = full75[class_id]['total positives'] - full50[class_id]['TP']
+        FN75 = full75[class_id]['total positives'] - full75[class_id]['TP']
         P = full50[class_id]['total positives']
 
 
         # max recall for 100 dets can also be calculated here
-        AR100 = np.mean([full[k][class_id]['TP'] / full[k][class_id]['total positives'] for k in full])
+        AR100 = [full[k][class_id]['TP'] / full[k][class_id]['total positives'] for k in full]
+        if AR100 is not None and len(AR100)>0:
+            AR100 = np.mean(AR100)
 
         small = {
             i: _evaluate(iou_threshold=i, max_dets=100, area_range=(0, 32**2))
