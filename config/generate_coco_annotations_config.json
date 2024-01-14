@@ -1,6 +1,6 @@
 {
     "k_folds": 5,
-    "fold_index": 1,
+    "fold_index": 0,
     "validation":true,
     "train_val_test_split": [0.6, 0.1, 0.3],
     "vgg_annotations_path": "./annotations/VIA/",
