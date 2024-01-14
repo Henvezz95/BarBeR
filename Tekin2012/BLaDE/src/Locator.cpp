@@ -63,7 +63,7 @@ void BarcodeLocator::locate(BarcodeList& barcodes)
 		//Tally the resulting votes to estimate barcode orientation
 		getBarcodeCandidates(orientationModes);
 		//If barcodes found, sort barcodes
-		LOGD("%u barcode candidates found\n", barcodeCandidates_.size());
+		//LOGD("%u barcode candidates found\n", barcodeCandidates_.size());
 		if (barcodeCandidates_.size())
 		{
 			//Sort the barcodes
@@ -304,7 +304,7 @@ bool BarcodeLocator::scanSegment(BarcodeCandidate &aBC, const TPointInt &pt)
 		} //switch direction
 	}
 	//See if the "edge density" is above the threshold, and save if it is.
-	LOGD("Barcode detected at (%d,%d) and orientation %d has %d edges\n", pt.x, pt.y, aBC.orientation, aBC.nEdges);
+	//LOGD("Barcode detected at (%d,%d) and orientation %d has %d edges\n", pt.x, pt.y, aBC.orientation, aBC.nEdges);
 	//TODO: check the following line!!
 	return ( aBC.nEdges > std::max( opts_.minEdgesInBarcode, (int) (aBC.width() * opts_.minEdgeDensityInBarcode) ) );
 }
