@@ -16,5 +16,5 @@ class Gallo_detector:
 
         self.cdll.galloProcess(result, input_img, h,w, c_int(self.winsize));
         result = np.array(result)
-        return [result], ['1D'], None #Boxes, classes, confidence scores
+        return [result], ['1D'], [None] #Boxes, classes, confidence scores
 

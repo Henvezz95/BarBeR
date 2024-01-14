@@ -18,4 +18,4 @@ class Tekin_detector:
         self.cdll.locateBarcodes(result, num_results, input_img, h,w)
         result = np.array(result).ravel()
         result = result[:int(num_results[0])*4].reshape((-1,2,2))
-        return result, ['1D']*len(result), None #Boxes, classes, confidence scores
+        return result, ['1D']*len(result), [None]*len(result) #Boxes, classes, confidence scores

@@ -27,15 +27,15 @@ class Zamberletti_detector:
             M = cv2.getRotationMatrix2D(center, -angle[0], 1.0)
             result[i] = np.matmul(result[i], M[:,:2].T)+M[:,2]
 
-        return result, ['1D']*len(result), None #Polygons, classes, confidence scores
+        return result, ['1D']*len(result), [None]*len(result) #Polygons, classes, confidence scores
 
     def detect(self, img):
-        polygons, classes, _ = self.detect_polygons(img)
+        polygons, classes, confidences = self.detect_polygons(img)
         result = []
         for poly in polygons:
             result.append(cv2.boundingRect(poly))
 
-        return result, classes, None #Boxes, classes, confidence scores
+        return result, classes, confidences #Boxes, classes, confidence scores
     
 
 

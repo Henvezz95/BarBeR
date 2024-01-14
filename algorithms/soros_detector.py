@@ -18,17 +18,17 @@ class Soros_detector:
         if self.detectionType == '1D':
             self.cdll.sorosProcess(result, input_img, h,w, c_bool(True), c_int(self.winsize));
             results = [np.array(result)]
-            return results, ['1D'], None #Boxes, classes, confidence scores
+            return results, ['1D'], [None] #Boxes, classes, confidence scores
         elif self.detectionType == '2D':
             self.cdll.sorosProcess(result, input_img, h,w, c_bool(False), c_int(self.winsize));
             results = [np.array(result)]
-            return results, ['2D'], None #Boxes, classes, confidence scores
+            return results, ['2D'], [None] #Boxes, classes, confidence scores
         else:
             results = []
             self.cdll.sorosProcess(result, input_img, h,w, c_bool(True), c_int(self.winsize));
             results.append(np.array(result))
             self.cdll.sorosProcess(result, input_img, h,w, c_bool(False), c_int(self.winsize));
             results.append(np.array(result))
-            return results, ['1D','2D'], None #Boxes, classes, confidence scores
+            return results, ['1D','2D'], [None, None] #Boxes, classes, confidence scores
 
 
