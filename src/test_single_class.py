@@ -1,0 +1,167 @@
+import numpy as np
+import cv2
+import json
+import sys
+import getopt
+from tqdm import tqdm
+
+from utility import box_to_poly
+from bounding_box import BoundingBox
+from evaluators import coco_evaluator
+from utils.enumerators import BBType
+
+sys.path.append('./algorithms/') 
+
+def parse_inputs(file_path, argv):
+    config_path = None
+    output_path = None
+    file_name = file_path.split('/')[-1]
+    try:
+        opts, args = getopt.getopt(argv, "hc:o:", ["cfile=", "ofolder="])
+    except getopt.GetoptError:
+        print(file_name, '-c <configfile> -o <outputfolder>')
+        print('The configuration file must be in json format')
+        sys.exit(2)
+    for opt, arg in opts:
+        if opt == '-h':
+            print(file_name, '-c <configfile> -o <outputfolder>')
+            print('The configuration file must be in json format')
+            sys.exit()
+        elif opt in ("-c", "--cfile"):
+            config_path = arg
+        elif opt in ("-o", "--ofolder"):
+            output_path = arg
+
+    if config_path == None:
+        print('A configuration file is needed to run the program')
+        print(file_name, '-c <configfile> -o <outputfolder>')
+        sys.exit(2)
+    if output_path == None:
+        print('Provide a folder to save the generated Results')
+        print(file_name, '-c <configfile> -o <outputfolder>')
+        sys.exit(2)
+
+    return config_path, output_path+'.json'
+
+def import_module(name):
+    components = name.split('.')
+    mod = __import__(components[0])
+    for comp in components[1:]:
+        mod = getattr(mod, comp)
+    return mod
+
+
+
+if __name__ == "__main__":
+    config_path, output_path = parse_inputs(sys.argv[0], sys.argv[1:])
+    
+    with open(config_path) as json_file:
+        test_config = json.load(json_file)
+
+    longest_edge_resize = test_config["longest_edge_resize"]
+    single_code = test_config["single_ROI"]
+    class_type =  test_config["class"]
+    class_id = 0 if class_type == '1D' else 1
+    coco_annotation_path = test_config["coco_annotations_path"]
+
+    with open(f'{coco_annotation_path}test.json') as json_file:
+        coco_annotations = json.load(json_file)
+
+    with open(f'{coco_annotation_path}datasets_info.json') as json_file:
+        datasets_info = json.load(json_file)
+
+    VIA_datasets = {}
+    for dataset_name in datasets_info['datasets']:
+        with open(datasets_info['datasets'][dataset_name]) as json_file:
+            data = json.load(json_file)['_via_img_metadata']
+            VIA_datasets[dataset_name] = {value['filename']:value for _, value in data.items()}
+
+    detectors = {}
+
+    for algorithm in test_config['algorithms']:
+        mod = import_module(algorithm['library'])
+        mod = getattr(mod, algorithm['class'])
+        detectors[algorithm['name']] = mod(**algorithm['args'])
+
+    ann_index = 0
+    image_counter = 0
+    GT_area = 0
+    total_area = 0
+    ppe_values = []
+    detected_bbs = {detector_name:[] for detector_name in detectors}
+    groundtruth_bbs = {detector_name:[] for detector_name in detectors}
+
+    for image_annotation in tqdm(coco_annotations['images']):
+        id = image_annotation['id']
+        file_name = image_annotation['file_name']
+        true_boxes = []
+        true_polygons = []
+        remove_this_image = False
+        while coco_annotations['annotations'][ann_index]['image_id'] == id:
+            true_boxes.append(np.array(coco_annotations['annotations'][ann_index]['bbox']))
+            true_polygons.append(np.array(coco_annotations['annotations'][ann_index]['segmentation']).reshape(4,2))
+            if coco_annotations['annotations'][ann_index]['category_id'] != class_id+1:
+                remove_this_image = True
+            
+            ann_index+=1
+            if ann_index >= len(coco_annotations['annotations']):
+                break
+
+        if single_code and (len(true_boxes) != 1):
+            remove_this_image = True
+        if remove_this_image:
+            continue
+
+        img_path = datasets_info['images'][file_name]['path']
+        img = cv2.imread(img_path)
+        image_counter+=1
+        H,W,_ = img.shape
+        if W > H:
+            W_new = longest_edge_resize
+            H_new = int(np.round((H*W_new)/W))
+        else:
+            H_new = longest_edge_resize
+            W_new = int(np.round((W*H_new)/H))
+
+        total_area += (W_new*H_new)/1000000
+
+
+        for i in range(len(true_boxes)):
+            true_boxes[i][0::2] = np.int32(np.round(W_new*true_boxes[i][0::2]/W))
+            true_boxes[i][1::2] = np.int32(np.round(H_new*true_boxes[i][1::2]/H))
+            true_polygons[i][:,0] = np.int32(np.round(W_new*true_polygons[i][:,0]/W))
+            true_polygons[i][:,1] = np.int32(np.round(H_new*true_polygons[i][:,1]/H))
+            GT_area += (true_boxes[i][-2]* true_boxes[i][-1])/1000000 
+        
+        img = cv2.resize(img, (W_new, H_new), cv2.INTER_CUBIC)
+        
+        dataset_name = datasets_info['images'][file_name]['dataset']
+        ppe = (W_new/W)*float(VIA_datasets[dataset_name][file_name]['regions'][0]['region_attributes']['PPE'])
+        if ppe > 0:
+            ppe_values.append(ppe)
+        
+        for detector_name, detector in detectors.items():
+            boxes, classes, confidences = detector.detect(img)
+            detected_bbs[detector_name].extend([
+                BoundingBox(file_name, 
+                            0 if classes[i] == '1D' else 1, 
+                            boxes[i], 
+                            img_size=(W_new, H_new), 
+                            confidence=confidences[i] if confidences[i] is not None else 1, 
+                            bb_type=BBType.DETECTED) for i in range(len(boxes))])
+            groundtruth_bbs[detector_name].extend([
+                BoundingBox(file_name, 
+                            0 if class_type == '1D' else 1,
+                            true_boxes[i], 
+                            img_size=(W_new, H_new), 
+                            confidence=1, 
+                            bb_type=BBType.GROUND_TRUTH) for i in range(len(true_boxes))])
+
+    print(image_counter, total_area, GT_area)
+    results = {"image_count": int(image_counter), "total_area": float(total_area), "GT_area": float(GT_area), "evaluation":{}}
+    for detector_name in detectors:
+        COCOevaluation = coco_evaluator.get_coco_summary(groundtruth_bbs[detector_name], detected_bbs[detector_name])
+        results['evaluation'][detector_name] = {key: float(value) for key,value in COCOevaluation.items()}
+
+    with open(output_path, 'w') as f:
+        json.dump(results, f, ensure_ascii=False, indent=4)
