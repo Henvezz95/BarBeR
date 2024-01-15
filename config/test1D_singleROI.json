@@ -47,7 +47,7 @@
             "library": "ultralytics_detector",
             "class": "YOLO_detector",
             "args": {
-                "model_path": "./Saved Models/yolov8n_640_2cl.onnx",
+                "model_path": "./Saved Models/yolov8n_640_nomosaic.onnx",
                 "imgsz": 640
             }
         },
