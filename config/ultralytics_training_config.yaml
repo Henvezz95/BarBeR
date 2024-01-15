@@ -1,0 +1,15 @@
+dataset_path: "./dataset/"
+model_type: "yolo" #Available types are "yolo" or "rtdetr"
+pretrained_model: "yolov8n.pt"
+args: 
+  epochs: 2
+  imgsz: 640
+  patience: 10
+  scale: 0.0
+  mosaic: 0.0
+  fliplr: 0.5
+  flipud: 0.5 
+  hsv_h: 0
+
+format: "onnx" # onnx is recommended. Other available formats are pytorch and torchscript
+output_path: "./Saved Models/letsseeifitworks" #The file extension is added depending on format

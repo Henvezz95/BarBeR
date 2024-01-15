@@ -1,5 +1,6 @@
 import numpy as np
 import json
+import yaml
 from tqdm import tqdm
 import getopt, os
 import sys
@@ -120,5 +121,17 @@ if __name__ == "__main__":
 
     with open(f'{output_path}val.txt', 'w') as f:
         f.write(string)
+
+    data_yaml = {
+        'test': 'test.txt',
+        'train': 'train.txt',
+        'val': 'val.txt',
+
+        'nc': 2,
+        'names':{0: '1D', 1: '2D'}
+    }
+
+    with open(f'{output_path}data.yaml', 'w') as outfile:
+        yaml.dump(data_yaml, outfile, default_flow_style=False)
 
 
