@@ -1,0 +1,30 @@
+class: 2D
+coco_annotations_path: ./annotations/COCO/
+longest_edge_resize: 640
+single_ROI: true
+algorithms:
+- args:
+    detectionType: 2D
+    lib_path: ./build/Gallo2011-Soros2013-Yun2017/libBarcodeLocalization.so
+    winsize: 20
+  class: Soros_detector
+  library: soros_detector
+  name: Soros
+- args:
+    imgsz: 640
+    model_path: ./Saved Models/yolov8n_640_2cl.onnx
+  class: YOLO_detector
+  library: ultralytics_detector
+  name: Yolo nano
+- args:
+    imgsz: 640
+    model_path: ./Saved Models/yolov8s_640_2cl.onnx
+  class: YOLO_detector
+  library: ultralytics_detector
+  name: Yolo small
+- args:
+    model_path: ./Saved Models/Detectron2_models/model_final.pth
+  class: Detectron2_detector
+  library: detectron2_detector
+  name: Faster RCNN
+

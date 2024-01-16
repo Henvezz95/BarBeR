@@ -1,0 +1,35 @@
+class: 1D
+coco_annotations_path: ./annotations/COCO/
+longest_edge_resize: 640
+single_ROI: false
+algorithms:
+- args:
+    lib_path: ./build/Gallo2011-Soros2013-Yun2017/libBarcodeLocalization.so
+    winsize: 20
+  class: Yun_detector
+  library: yun_detector
+  name: Yun
+- args:
+    lib_path: ./build/Zamberletti2013/libBarcodeLibrary.so
+    net_path: ./Zamberletti2013/net61x3.net
+    winsize: 20
+  class: Zamberletti_detector
+  library: zamberletti_detector
+  name: Zamberletti
+- args:
+    imgsz: 640
+    model_path: ./Saved Models/yolov8n_640_2cl.onnx
+  class: YOLO_detector
+  library: ultralytics_detector
+  name: Yolo nano
+- args:
+    imgsz: 640
+    model_path: ./Saved Models/yolov8s_640_2cl.onnx
+  class: YOLO_detector
+  library: ultralytics_detector
+  name: Yolo small
+- args:
+    model_path: ./Saved Models/Detectron2_models/model_final.pth
+  class: Detectron2_detector
+  library: detectron2_detector
+  name: Faster RCNN

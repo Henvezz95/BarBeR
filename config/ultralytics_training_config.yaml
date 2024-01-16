@@ -12,4 +12,3 @@ args:
   hsv_h: 0
 
 format: "onnx" # onnx is recommended. Other available formats are pytorch and torchscript
-output_path: "./Saved Models/letsseeifitworks" #The file extension is added depending on format

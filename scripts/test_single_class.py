@@ -5,10 +5,10 @@ import sys
 import getopt
 from tqdm import tqdm
 
-from utility import box_to_poly
 from bounding_box import BoundingBox
 from evaluators import coco_evaluator
 from utils.enumerators import BBType
+import yaml
 
 sys.path.append('./algorithms/') 
 
@@ -17,15 +17,15 @@ def parse_inputs(file_path, argv):
     output_path = None
     file_name = file_path.split('/')[-1]
     try:
-        opts, args = getopt.getopt(argv, "hc:o:", ["cfile=", "ofolder="])
+        opts, _ = getopt.getopt(argv, "hc:o:", ["cfile=", "ofolder="])
     except getopt.GetoptError:
         print(file_name, '-c <configfile> -o <outputfolder>')
-        print('The configuration file must be in json format')
+        print('The configuration file must be in yaml format')
         sys.exit(2)
     for opt, arg in opts:
         if opt == '-h':
             print(file_name, '-c <configfile> -o <outputfolder>')
-            print('The configuration file must be in json format')
+            print('The configuration file must be in yaml format')
             sys.exit()
         elif opt in ("-c", "--cfile"):
             config_path = arg
@@ -33,15 +33,17 @@ def parse_inputs(file_path, argv):
             output_path = arg
 
     if config_path == None:
-        print('A configuration file is needed to run the program')
+        print('A configuration file in yaml format is needed to run the program')
         print(file_name, '-c <configfile> -o <outputfolder>')
         sys.exit(2)
     if output_path == None:
-        print('Provide a folder to save the generated Results')
+        print('Provide a path to save the generated Results')
         print(file_name, '-c <configfile> -o <outputfolder>')
         sys.exit(2)
 
-    return config_path, output_path+'.json'
+    if output_path[-5:] != '.yaml':
+        output_path+='.yaml'
+    return config_path, output_path
 
 def import_module(name):
     components = name.split('.')
@@ -55,8 +57,8 @@ def import_module(name):
 if __name__ == "__main__":
     config_path, output_path = parse_inputs(sys.argv[0], sys.argv[1:])
     
-    with open(config_path) as json_file:
-        test_config = json.load(json_file)
+    with open(config_path, "r") as stream:
+       test_config = yaml.safe_load(stream)
 
     longest_edge_resize = test_config["longest_edge_resize"]
     single_code = test_config["single_ROI"]
@@ -161,7 +163,8 @@ if __name__ == "__main__":
     results = {"image_count": int(image_counter), "total_area": float(total_area), "GT_area": float(GT_area), "evaluation":{}}
     for detector_name in detectors:
         COCOevaluation = coco_evaluator.get_coco_summary(groundtruth_bbs[detector_name], detected_bbs[detector_name])
-        results['evaluation'][detector_name] = {key: float(value) for key,value in COCOevaluation.items()}
+        results['evaluation'][detector_name] = {key: value.item() for key,value in COCOevaluation.items()}
 
-    with open(output_path, 'w') as f:
-        json.dump(results, f, ensure_ascii=False, indent=4)
+
+    with open(output_path, 'w') as outfile:
+        yaml.dump(results, outfile, default_flow_style=False, sort_keys=False)
