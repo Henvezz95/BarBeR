@@ -7,6 +7,9 @@ import datetime
 from tqdm import tqdm
 from glob import glob
 import numpy as np
+import yaml
+import getopt
+import sys
 
 def create_image_info(image_id, file_name, image_size,
                       date_captured=datetime.datetime.utcnow().isoformat(' '),
@@ -101,7 +104,7 @@ def convert_all(img_files, annpaths):
             # for one image ,there are many regions,they share the same img id
             for region in regions:
                 cat = region['region_attributes']['Type']
-                cat_id = 2 if cat in ['QR', 'DATAMATRIX', 'AZTEC', 'PDF417'] else 1
+                cat_id = 2 if cat in ['QR', 'DATAMATRIX', 'AZTEC', 'PDF417', '2D'] else 1
                 if region['shape_attributes']['name'] == 'polygon':
                     points_x = region['shape_attributes']['all_points_x']
                     points_y = region['shape_attributes']['all_points_y']
@@ -127,100 +130,131 @@ def convert_all(img_files, annpaths):
 
     return coco_output
 
+def parse_inputs(file_path, argv):
+    config_path = None
+    k_index = None
+    file_name = file_path.split('/')[-1]
+    try:
+        opts, _ = getopt.getopt(argv, "hc:k:", ["cfile=", "kindex="])
+    except getopt.GetoptError:
+        print(file_name, '-c <configfile> -k <k_fold_index>')
+        print('The configuration file must be in yaml format. K indicates which k-fold interation has to be generated. K is only needed if k-fold is activated')
+        sys.exit(2)
+    for opt, arg in opts:
+        if opt == '-h':
+            print(file_name, '-c <configfile> -k <k_fold_index>')
+            print('The configuration file must be in yaml format. K indicates which k-fold interation has to be generated. K is only needed if k-fold is activated')
+            sys.exit()
+        elif opt in ("-c", "--cfile"):
+            config_path = arg
+        elif opt in ("-k", "--kindex"):
+            k_index = arg
 
-config_file_path = './config/generate_coco_annotations_config.json'
+    if config_path == None:
+        print(file_name, '-c <configfile> -k <k_fold_index>')
+        print('The configuration file must be in yaml format. K indicates which k-fold interation has to be generated. K is only needed if k-fold is activated')
+        sys.exit(2)
 
-with open(config_file_path) as json_file:
-    annotations_config = json.load(json_file)
-
-vgg_annotations_basepath = annotations_config['vgg_annotations_path']
-img_paths = glob(annotations_config['images_path']+'*.[jJ][pP][gGeE]*')
-output_path = annotations_config['output_path']
-if 'k_folds' in annotations_config and annotations_config['k_folds']>1:
-    k_folds = annotations_config['k_folds']
-    if annotations_config['validation']:
-        train_val_test_split =  [(k_folds-2)/(k_folds), 1/k_folds, 1/k_folds]
-    else:
-        train_val_test_split =  [(k_folds-1)/(k_folds), 0, 1/k_folds]
-    fold_index = annotations_config['fold_index']
-else:
-    k_folds = 1
-    fold_index = 0
-    train_val_test_split = annotations_config['train_val_test_split']
-salt = annotations_config['salt']
-
-if len(annotations_config['annotation_files']) == 0:
-    annotations = glob(f'{vgg_annotations_basepath}*.json', recursive=True)
-else:
-    annotations = [vgg_annotations_basepath + file_path for file_path in annotations_config['annotation_files']]
+    return config_path, int(k_index)
 
 
-train_val_test_split = np.array(train_val_test_split)/np.sum(train_val_test_split)
-th1 = train_val_test_split[0]
-th2 = th1+train_val_test_split[1]
 
-train_files = []
-val_files = []
-test_files = []
+if __name__ == "__main__":
+    config_path, fold_index = parse_inputs(sys.argv[0], sys.argv[1:])
+    
+    with open(config_path) as yaml_file:
+        annotations_config = yaml.safe_load(yaml_file)
 
-for img_path in img_paths:
-    file_name = os.path.basename(img_path)
-    hash_code = int(hashlib.sha256(((file_name+salt).encode('utf-8'))).hexdigest(), 16) 
-    hash_code = int((int(hash_code % 10 ** 4)+(10 ** 4)*(fold_index/k_folds))% 10 ** 4)
-    if hash_code < th1 * (10 ** 4):
-        train_files.append(img_path)
-    elif hash_code < th2 * (10 ** 4):
-        val_files.append(img_path) 
-    else:
-        test_files.append(img_path)
-
-print('Train Images: '+str(len(train_files)), 
-      'Validation Images: '+str(len(val_files)),
-      'Test Images: '+str(len(test_files)))
-
-datasets_dictionary = {
-    'datasets' : {},
-    'images' : {}
-}
-for json_path in annotations:
-    datasets_dictionary['datasets'][os.path.basename(json_path).split('.')[0]] = json_path
-
-for json_path in annotations:
-    ann = json.load(open(json_path))['_via_img_metadata']
-    for key in ann:
-        file_name = ann[key]['filename']
-        path = annotations_config['images_path'] + file_name
-        dataset_name = os.path.basename(json_path).split('.')[0]
-        if path in train_files:
-            split = 'train'
-        elif path in val_files:
-            split = 'val'
-        elif path in test_files:
-            split = 'test'
+    vgg_annotations_basepath = annotations_config['vgg_annotations_path']
+    img_paths = glob(annotations_config['images_path']+'*.[jJ][pP][gGeE]*')
+    output_path = annotations_config['output_path']
+    if 'k_folds' in annotations_config:
+        if fold_index is None:
+            raise Exception("K-fold is True, but the current index was not specified!")
+        k_folds = annotations_config['k_folds']
+        if annotations_config['validation']:
+            train_val_test_split =  [(k_folds-2)/(k_folds), 1/k_folds, 1/k_folds]
         else:
-            continue
-        datasets_dictionary['images'][file_name] = {
-            'dataset': dataset_name,
-            'split': split,
-            'path': path,
-            'key': key
-        }
+            train_val_test_split =  [(k_folds-1)/(k_folds), 0, 1/k_folds]
+    else:
+        k_folds = 1
+        fold_index = 0
+        train_val_test_split = annotations_config['train_val_test_split']
+    salt = annotations_config['salt']
 
-with open(output_path + 'datasets_info.json', "w") as outfile: 
-    json.dump(datasets_dictionary, outfile, indent=2)
+    if len(annotations_config['annotation_files']) == 0:
+        annotations = glob(f'{vgg_annotations_basepath}*.json', recursive=True)
+    else:
+        annotations = [vgg_annotations_basepath + file_path for file_path in annotations_config['annotation_files']]
 
 
-coco_train = convert_all(train_files, annotations)
-with open(output_path + 'train.json', "w") as outfile: 
-    json.dump(coco_train, outfile, indent=2)
+    train_val_test_split = np.array(train_val_test_split)/np.sum(train_val_test_split)
+    th1 = train_val_test_split[0]
+    th2 = th1+train_val_test_split[1]
 
-coco_val = convert_all(val_files, annotations)
-with open(output_path + 'val.json', "w") as outfile: 
-    json.dump(coco_val, outfile, indent=2)
+    train_files = []
+    val_files = []
+    test_files = []
 
-coco_test = convert_all(test_files, annotations)
-with open(output_path + 'test.json', "w") as outfile: 
-    json.dump(coco_test, outfile, indent=2)
+    for img_path in img_paths:
+        file_name = os.path.basename(img_path)
+        hash_code = int(hashlib.sha256(((file_name+salt).encode('utf-8'))).hexdigest(), 16) 
+        hash_code = int((int(hash_code % 10 ** 4)+(10 ** 4)*(fold_index/k_folds))% 10 ** 4)
+        if hash_code < th1 * (10 ** 4):
+            train_files.append(img_path)
+        elif hash_code < th2 * (10 ** 4):
+            val_files.append(img_path) 
+        else:
+            test_files.append(img_path)
+
+    print('Train Images: '+str(len(train_files)), 
+        'Validation Images: '+str(len(val_files)),
+        'Test Images: '+str(len(test_files)))
+
+    datasets_dictionary = {
+        'datasets' : {},
+        'images' : {}
+    }
+    for json_path in annotations:
+        datasets_dictionary['datasets'][os.path.basename(json_path).split('.')[0]] = json_path
+
+    for json_path in annotations:
+        ann = json.load(open(json_path))['_via_img_metadata']
+        for key in ann:
+            file_name = ann[key]['filename']
+            path = annotations_config['images_path'] + file_name
+            dataset_name = os.path.basename(json_path).split('.')[0]
+            if path in train_files:
+                split = 'train'
+            elif path in val_files:
+                split = 'val'
+            elif path in test_files:
+                split = 'test'
+            else:
+                continue
+            datasets_dictionary['images'][file_name] = {
+                'dataset': dataset_name,
+                'split': split,
+                'path': path,
+                'key': key
+            }
+
+    coco_train = convert_all(train_files, annotations)
+    with open(output_path + 'train.json', "w") as outfile: 
+        json.dump(coco_train, outfile, indent=2)
+
+    coco_val = convert_all(val_files, annotations)
+    with open(output_path + 'val.json', "w") as outfile: 
+        json.dump(coco_val, outfile, indent=2)
+
+    coco_test = convert_all(test_files, annotations)
+    with open(output_path + 'test.json', "w") as outfile: 
+        json.dump(coco_test, outfile, indent=2)
+
+    datasets_dictionary['categories'] = coco_train['categories']
+
+    with open(output_path + 'datasets_info.json', "w") as outfile: 
+        json.dump(datasets_dictionary, outfile, indent=2)
 
 
 
