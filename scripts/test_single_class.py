@@ -60,7 +60,10 @@ if __name__ == "__main__":
     with open(config_path, "r") as stream:
        test_config = yaml.safe_load(stream)
 
-    longest_edge_resize = test_config["longest_edge_resize"]
+    if "longest_edge_resize" in test_config:
+        longest_edge_resize = test_config["longest_edge_resize"]
+    else:
+        longest_edge_resize = -1
     single_code = test_config["single_ROI"]
     class_type =  test_config["class"]
     class_id = 0 if class_type == '1D' else 1
@@ -101,7 +104,7 @@ if __name__ == "__main__":
         remove_this_image = False
         while coco_annotations['annotations'][ann_index]['image_id'] == id:
             true_boxes.append(np.array(coco_annotations['annotations'][ann_index]['bbox']))
-            true_polygons.append(np.array(coco_annotations['annotations'][ann_index]['segmentation']).reshape(4,2))
+            true_polygons.append(np.array(coco_annotations['annotations'][ann_index]['segmentation']).reshape(-1,2))
             if coco_annotations['annotations'][ann_index]['category_id'] != class_id+1:
                 remove_this_image = True
             
@@ -118,15 +121,19 @@ if __name__ == "__main__":
         img = cv2.imread(img_path)
         image_counter+=1
         H,W,_ = img.shape
-        if W > H:
-            W_new = longest_edge_resize
-            H_new = int(np.round((H*W_new)/W))
+        if longest_edge_resize > 0:
+            if W > H:
+                W_new = longest_edge_resize
+                H_new = int(np.round((H*W_new)/W))
+            else:
+                H_new = longest_edge_resize
+                W_new = int(np.round((W*H_new)/H))
+
+            img = cv2.resize(img, (W_new, H_new), cv2.INTER_CUBIC)
         else:
-            H_new = longest_edge_resize
-            W_new = int(np.round((W*H_new)/H))
-
+            H_new, W_new = H, W
+        
         total_area += (W_new*H_new)/1000000
-
 
         for i in range(len(true_boxes)):
             true_boxes[i][0::2] = np.int32(np.round(W_new*true_boxes[i][0::2]/W))
@@ -134,8 +141,6 @@ if __name__ == "__main__":
             true_polygons[i][:,0] = np.int32(np.round(W_new*true_polygons[i][:,0]/W))
             true_polygons[i][:,1] = np.int32(np.round(H_new*true_polygons[i][:,1]/H))
             GT_area += (true_boxes[i][-2]* true_boxes[i][-1])/1000000 
-        
-        img = cv2.resize(img, (W_new, H_new), cv2.INTER_CUBIC)
         
         dataset_name = datasets_info['images'][file_name]['dataset']
         ppe = (W_new/W)*float(VIA_datasets[dataset_name][file_name]['regions'][0]['region_attributes']['PPE'])
