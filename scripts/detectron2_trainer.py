@@ -113,7 +113,7 @@ if __name__ == "__main__":
     if 'learning_rate' in data_loaded:
         lr = data_loaded['learning_rate']
     else:
-        lr = 1e-3
+        lr = 2e-3
 
     imgsz = data_loaded['imgsz']
 
@@ -123,6 +123,7 @@ if __name__ == "__main__":
     cfg = get_cfg()
     cfg.merge_from_file(model_zoo.get_config_file(pre_trained_model))
     cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = 0.5
+    cfg.MODEL.RETINANET.SCORE_THRESH_TEST = 0.5
     cfg.MODEL.WEIGHTS = model_zoo.get_checkpoint_url(pre_trained_model)
 
     cfg.DATASETS.TRAIN = ("my_dataset_train")
@@ -134,7 +135,7 @@ if __name__ == "__main__":
     cfg.INPUT.MAX_SIZE = imgsz
     cfg.INPUT.MAX_SIZE_TRAIN = imgsz
     cfg.INPUT.MAX_SIZE_TEST = imgsz
-    cfg.DATALOADER.NUM_WORKERS = 0
+    cfg.DATALOADER.NUM_WORKERS = 8
     cfg.SOLVER.IMS_PER_BATCH = batch_size
     cfg.SOLVER.BASE_LR = lr
     cfg.SOLVER.MAX_ITER = epochs*num_train_steps   
@@ -182,21 +183,21 @@ if __name__ == "__main__":
                     loss_dict = self.trainer.model(data)
                     total_loss += sum(loss_dict.values())
             total_loss = total_loss/self.num_val_steps
-            total_loss = total_loss.cpu().detach().numpy()
+            total_loss = total_loss.cpu().detach().numpy().item()
 
             if not np.isnan(total_loss):  
                 if self.last_valloss:
-                    if total_loss > max(self.last_valloss):
+                    if total_loss < min(self.last_valloss):
                         self.best_model = trainer.model 
                         print('New best model!')
                 if len(self.last_valloss)>=patience:
-                    if np.argmax(self.last_valloss)==0 and total_loss < self.last_valloss[0]:
+                    if np.argmin(self.last_valloss)==0 and total_loss > self.last_valloss[0]:
                         raise Exception("Stopping early")
                     self.last_valloss[:patience-1] = self.last_valloss[1:]  
                     self.last_valloss[-1] = total_loss
                 else:
                     self.last_valloss.append(total_loss)
-            print([x.item for x in self.last_valloss])
+            print(self.last_valloss)
             
 
         def after_step(self):
