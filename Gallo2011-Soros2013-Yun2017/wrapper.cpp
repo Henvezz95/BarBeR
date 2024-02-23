@@ -38,11 +38,12 @@ void sorosProcess(int* result, unsigned char* img_color, int h, int w, bool is1D
 }
 
 
-void yunProcess(int* result, int* num_results, unsigned char* img_color, int h, int w){
+void yunProcess(int* result, int* num_results, unsigned char* img_color, int h, int w, int WinSz){
   *num_results = 0;
   cv::Mat image_color(h, w, CV_8UC3, img_color);
   cv::Mat image_greyscale;
   cv::cvtColor(image_color, image_greyscale, cv::COLOR_BGR2GRAY);
+  mYun.setWinSz(WinSz);
   std::vector<iy::YunCandidate> list_barcode = mYun.process(image_greyscale);
 	if (!list_barcode.empty())
 	{

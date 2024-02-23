@@ -1,14 +1,19 @@
 dataset_path: "./dataset/"
-model_type: "yolo" #Available types are "yolo" or "rtdetr"
-pretrained_model: "yolov8n.pt"
+model_type: "rtdetr" #Available types are "yolo" or "rtdetr"
+pretrained_model: "rtdetr-l.pt" #yolov8n.pt"
 args: 
-  epochs: 2
-  imgsz: 640
-  patience: 10
-  scale: 0.0
-  mosaic: 0.0
-  fliplr: 0.5
-  flipud: 0.5 
-  hsv_h: 0
+  epochs: 300
+  imgsz: 160
+  batch: 16 #default is 16
+  patience: 10 #default is 50
+  optimizer: "SGD"
+  scale: 0.0 #default is 0.5
+  mosaic: 0.0 #default is 1.0
+  fliplr: 0.5 #default is 0.5
+  flipud: 0.5 #default is 0
+  hsv_h: 0 #default is 0.015
+  lr0: 0.001 #Initial learning rate (0.001 is recommended for RT-DETR. Between 0.01 and 0.001 for YOLO. Default is 0.01.)
 
-format: "onnx" # onnx is recommended. Other available formats are pytorch and torchscript
+#All configuration parameters available on ultralytics work: https://docs.ultralytics.com/usage/cfg/#train
+
+format: "pytorch" # pytorch (.pt) is recommended. Other available formats are onnx (.onnx) and torchscript (.torchscript)

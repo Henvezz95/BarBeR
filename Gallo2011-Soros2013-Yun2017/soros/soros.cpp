@@ -22,7 +22,7 @@ using namespace iy;
 cv::Rect Soros::process(cv::Mat &gray_src, bool is1D /*= true*/, int WinSz /*= 20*/)
 
 {
-
+    cv::setNumThreads(0);
     cv::Rect result(0,0,0,0);
 
     

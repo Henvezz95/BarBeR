@@ -1,0 +1,31 @@
+coco_annotations_path: ./annotations/COCO/
+longest_edge_resize: 480
+algorithms:
+- args:
+    imgsz: 480
+    model_path: ./Saved Models/yolon_480_4.pt
+  class: YOLO_detector
+  library: ultralytics_detector
+  name: Yolo Nano
+- args:
+    imgsz: 480
+    model_path: ./Saved Models/yolom_480_4.pt
+  class: YOLO_detector
+  library: ultralytics_detector
+  name: Yolo Medium
+- args:
+    imgsz: 480
+    model_path: ./Saved Models/rtdetr_480_4.pt
+  class: RTDETR_detector
+  library: ultralytics_detector
+  name: RTDETR Large
+- args:
+    model_path: ./Saved Models/fasterRCNN_480_4.pt
+  class: Detectron2_detector
+  library: detectron2_detector
+  name: FASTER RCNN
+- args:
+    model_path: ./Saved Models/retinaNET_480_4.pt
+  class: Detectron2_detector
+  library: detectron2_detector
+  name: RetinaNet

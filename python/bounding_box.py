@@ -12,6 +12,7 @@ class BoundingBox:
                  image_name,
                  class_id=None,
                  coordinates=None,
+                 ppe=-1,
                  type_coordinates=CoordinatesType.ABSOLUTE,
                  img_size=None,
                  bb_type=BBType.GROUND_TRUTH,
@@ -55,6 +56,7 @@ class BoundingBox:
         self._type_coordinates = type_coordinates
         self._confidence = confidence
         self._class_id = class_id
+        self._ppe = ppe
         self._format = format
         if bb_type == BBType.DETECTED and confidence is None:
             raise IOError(
@@ -226,6 +228,9 @@ class BoundingBox:
             Class of the detected object (e.g. 'cat', 'dog', 'person', etc)
         """
         return self._class_id
+    
+    def get_ppe(self):
+        return self._ppe
 
     def get_image_size(self):
         """ Get the size of the image where the bounding box is represented.

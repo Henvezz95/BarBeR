@@ -41,6 +41,6 @@ extern "C" DLL_PUBLIC void galloProcess(int* result, unsigned char* img_color, i
 
 extern "C" DLL_PUBLIC void sorosProcess(int* result, unsigned char* img_color, int h, int w, bool is1D, int WinSz);
 
-extern "C" DLL_PUBLIC void yunProcess(int* result, int* num_results, unsigned char* img_color, int h, int w);
+extern "C" DLL_PUBLIC void yunProcess(int* result, int* num_results, unsigned char* img_color, int h, int w, int WinSz);
 
 #endif //BARCODE_WRAPPER

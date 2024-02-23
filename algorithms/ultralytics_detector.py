@@ -1,13 +1,22 @@
 from ultralytics import YOLO, RTDETR
+from time import perf_counter_ns
+import torch
 
 
 class YOLO_detector:
-    def __init__(self, model_path, imgsz):
+    def __init__(self, model_path, imgsz, device = None):
         self.model = YOLO(model_path, task='detect')
+        if device in ['gpu', 'cuda']:
+            self.model.to('cuda')
+        if device == 'cpu':
+            self.model.to('cpu')
         self.imgsz = imgsz
+        self.timing = 0
 
     def detect(self, img):
+        start = perf_counter_ns()
         detection = self.model(img.astype('uint8'), verbose=False, imgsz=self.imgsz)
+        self.timing = (perf_counter_ns()-start)/10e6
         names = detection[0].names
         result = []
         predictions = []
@@ -21,13 +30,23 @@ class YOLO_detector:
 
         return result, predictions, confidences #Boxes, classes, confidence scores
     
+    def get_timing(self):
+        return self.timing
+    
 class RTDETR_detector:
-    def __init__(self, model_path, imgsz):
+    def __init__(self, model_path, imgsz, device = None):
         self.model = RTDETR(model_path)
+        if device in ['gpu', 'cuda']:
+            self.model.to('cuda')
+        if device == 'cpu':
+            self.model.to('cpu')
         self.imgsz = imgsz
+        self.timing = 0
 
     def detect(self, img):
+        start = perf_counter_ns()
         detection = self.model(img.astype('uint8'), verbose=False, imgsz=self.imgsz)
+        self.timing = (perf_counter_ns()-start)/10e6
         names = detection[0].names
         result = []
         predictions = []
@@ -40,3 +59,6 @@ class RTDETR_detector:
             confidences.append(conf)
 
         return result, predictions, confidences #Boxes, classes, confidence scores
+    
+    def get_timing(self):
+        return self.timing

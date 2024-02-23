@@ -19,10 +19,11 @@ using namespace iy;
 
 cv::Rect Gallo::process(cv::Mat &gray_src, int WinSz/*=20*/)
 {
+    cv::setNumThreads(0);
     cv::Rect result(0,0,0,0);
     
     try{
-       // gradirnt map
+       // gradient map
        cv::Mat hGrad = calc_gradient(gray_src);
        
        // integral map

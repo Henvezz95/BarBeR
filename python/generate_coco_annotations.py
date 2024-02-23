@@ -43,7 +43,7 @@ def create_annotation_info(annotation_id, image_id, category_id, is_crowd,
 
     return annotation_info
 
-def convert_all(img_files, annpaths):
+def convert_all(img_files, annpaths, datasets_dictionary):
     paths_dictionary = {os.path.basename(path):path for path in img_files}
 
     coco_output = {
@@ -124,8 +124,12 @@ def convert_all(img_files, annpaths):
                 segmentation = get_segmenation(points_x, points_y)
                 # make annotations info and storage it in coco_output['annotations']
                 ann_info = create_annotation_info(ann_id, img_id, cat_id, iscrowd, area, box, segmentation)
+                datasets_dictionary['images'][filename]['ids'].append(int(ann_id))
+                datasets_dictionary['images'][filename]['types'][int(ann_id)] = cat
+                datasets_dictionary['images'][filename]['ppes'][int(ann_id)] = float(region['region_attributes']['PPE'])
                 coco_output['annotations'].append(ann_info)
                 ann_id = ann_id + 1
+            datasets_dictionary['images'][filename]['shape'] = H,W
             img_id += 1
 
     return coco_output
@@ -236,18 +240,22 @@ if __name__ == "__main__":
                 'dataset': dataset_name,
                 'split': split,
                 'path': path,
-                'key': key
+                'key': key,
+                'shape':[],
+                'ids':[],
+                'ppes':{},
+                'types':{}
             }
 
-    coco_train = convert_all(train_files, annotations)
+    coco_train = convert_all(train_files, annotations, datasets_dictionary)
     with open(output_path + 'train.json', "w") as outfile: 
         json.dump(coco_train, outfile, indent=2)
 
-    coco_val = convert_all(val_files, annotations)
+    coco_val = convert_all(val_files, annotations, datasets_dictionary)
     with open(output_path + 'val.json', "w") as outfile: 
         json.dump(coco_val, outfile, indent=2)
 
-    coco_test = convert_all(test_files, annotations)
+    coco_test = convert_all(test_files, annotations, datasets_dictionary)
     with open(output_path + 'test.json', "w") as outfile: 
         json.dump(coco_test, outfile, indent=2)
 

@@ -8,7 +8,25 @@ class Point():
         self.x = x
         self.y = y
 
+def join(loader, node):
+    seq = loader.construct_sequence(node)
+    return ''.join([str(i) for i in seq])
 
+def from_np(value):
+    if value is None:
+        return 'nan'
+    if isinstance(value, list):
+        if not value:
+            return 'nan'
+        if value[0] is None:
+            return 'nan'
+        return value
+    if np.isnan(value):
+        return 'nan'
+    if hasattr(value, 'item'):
+        return value.item()
+    else:
+        return value
 
 def GetAreaOfPolyGon(points_x, points_y):
     points = []

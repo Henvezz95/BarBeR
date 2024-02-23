@@ -1,30 +1,103 @@
-class: 2D
 coco_annotations_path: ./annotations/COCO/
 longest_edge_resize: 640
+class: 2D
 single_ROI: true
 algorithms:
 - args:
-    detectionType: 2D
     lib_path: ./build/Gallo2011-Soros2013-Yun2017/libBarcodeLocalization.so
-    winsize: 20
+    winsize: 10
+    detectionType: 2D
   class: Soros_detector
   library: soros_detector
-  name: Soros
+  name: Soros10
+- args:
+    lib_path: ./build/Gallo2011-Soros2013-Yun2017/libBarcodeLocalization.so
+    winsize: 15
+    detectionType: 2D
+  class: Soros_detector
+  library: soros_detector
+  name: Soros15
+- args:
+    lib_path: ./build/Gallo2011-Soros2013-Yun2017/libBarcodeLocalization.so
+    winsize: 20
+    detectionType: 2D
+  class: Soros_detector
+  library: soros_detector
+  name: Soros20
+- args:
+    lib_path: ./build/Gallo2011-Soros2013-Yun2017/libBarcodeLocalization.so
+    winsize: 25
+    detectionType: 2D
+  class: Soros_detector
+  library: soros_detector
+  name: Soros25
+- args:
+    lib_path: ./build/Gallo2011-Soros2013-Yun2017/libBarcodeLocalization.so
+    winsize: 31
+    detectionType: 2D
+  class: Soros_detector
+  library: soros_detector
+  name: Soros31
+- args:
+    lib_path: ./build/Gallo2011-Soros2013-Yun2017/libBarcodeLocalization.so
+    winsize: 31
+    detectionType: 1D
+  class: Soros_detector
+  library: soros_detector
+  name: Soros31_1D
+- args:
+    lib_path: ./build/Gallo2011-Soros2013-Yun2017/libBarcodeLocalization.so
+    winsize: 35
+    detectionType: 2D
+  class: Soros_detector
+  library: soros_detector
+  name: Soros35
+- args:
+    lib_path: ./build/Gallo2011-Soros2013-Yun2017/libBarcodeLocalization.so
+    winsize: 40
+    detectionType: 2D
+  class: Soros_detector
+  library: soros_detector
+  name: Soros40
+- args:
+    lib_path: ./build/Gallo2011-Soros2013-Yun2017/libBarcodeLocalization.so
+    winsize: 45
+    detectionType: 2D
+  class: Soros_detector
+  library: soros_detector
+  name: Soros45
+- args:
+    lib_path: ./build/Gallo2011-Soros2013-Yun2017/libBarcodeLocalization.so
+    winsize: 50
+    detectionType: 2D
+  class: Soros_detector
+  library: soros_detector
+  name: Soros50
 - args:
     imgsz: 640
-    model_path: ./Saved Models/yolov8n_640_2cl.onnx
+    model_path: ./Saved Models/yolon_640_4.pt
   class: YOLO_detector
   library: ultralytics_detector
-  name: Yolo nano
+  name: Yolo Nano
 - args:
     imgsz: 640
-    model_path: ./Saved Models/yolov8s_640_2cl.onnx
+    model_path: ./Saved Models/yolom_640_4.pt
   class: YOLO_detector
   library: ultralytics_detector
-  name: Yolo small
+  name: Yolo Medium
 - args:
-    model_path: ./Saved Models/Detectron2_models/model_final.pth
+    imgsz: 640
+    model_path: ./Saved Models/rtdetr_640_4.pt
+  class: RTDETR_detector
+  library: ultralytics_detector
+  name: RTDETR Large
+- args:
+    model_path: ./Saved Models/fasterRCNN_640_4.pt
   class: Detectron2_detector
   library: detectron2_detector
-  name: Faster RCNN
-
+  name: FASTER RCNN
+- args:
+    model_path: ./Saved Models/retinaNET_640_4.pt
+  class: Detectron2_detector
+  library: detectron2_detector
+  name: RetinaNet

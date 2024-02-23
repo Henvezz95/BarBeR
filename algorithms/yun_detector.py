@@ -1,5 +1,6 @@
 from ctypes import *
 import numpy as np
+from time import perf_counter_ns
 
 class Yun_detector:
     def __init__(self, lib_path, winsize=20, max_rois=50):
@@ -15,8 +16,14 @@ class Yun_detector:
         result = (c_int*self.max_rois*4)()
         num_results = (c_int*1)()
 
-        self.cdll.yunProcess(result, num_results, input_img, h,w);
+        start = perf_counter_ns()
+        self.cdll.yunProcess(result, num_results, input_img, h,w, c_int(self.winsize))
+        self.timing = (perf_counter_ns()-start)/10e6
         result = np.array(result).ravel()
         result = np.array(result)[:num_results[0]*4].reshape((-1,4))
         return result, ['1D']*len(result), [None]*len(result) #Boxes, classes, confidence scores
+    
+    def get_timing(self):
+        return self.timing
+
 

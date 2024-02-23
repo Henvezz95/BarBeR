@@ -19,6 +19,7 @@ using namespace iy;
 
 std::vector<YunCandidate> Yun::process(cv::Mat &gray_src)
 {
+	cv::setNumThreads(0);
 	std::vector<YunCandidate> result;
 
 	try{
@@ -315,8 +316,8 @@ std::vector<YunLabel> Yun::ccl(cv::Mat &src, cv::Mat &oMap, std::vector<YunOrien
 				{
 					for (int n = c - 1; n <= c + 1; n++)
 					{
-						if ((m < 0) || (m >= imSz.height)) continue;	// height ¹üÀ§ ÇÑÁ¤
-						if ((n < 0) || (n >= imSz.width)) continue;	// width ¹üÀ§ ÇÑÁ¤
+						if ((m < 0) || (m >= imSz.height)) continue;	// height ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
+						if ((n < 0) || (n >= imSz.width)) continue;	// width ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 
 						if (mask.at<uchar>(m, n) != 0 ||
 							src.at<uchar>(m, n) < 128) continue;

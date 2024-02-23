@@ -76,6 +76,9 @@ namespace iy{
 		}
 		~Yun() {}
 
+		void setWinSz(int winSZ){
+			pam.winSz = winSZ;
+		}
 		std::vector<YunCandidate> process(cv::Mat &gray_src);
 		std::vector<YunCandidate> process(cv::Mat &gray_src, YunParams pams)
 		{

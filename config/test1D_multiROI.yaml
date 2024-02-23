@@ -1,7 +1,5 @@
-class: 1D
 coco_annotations_path: ./annotations/COCO/
-longest_edge_resize: 640
-single_ROI: false
+longest_edge_resize: 480
 algorithms:
 - args:
     lib_path: ./build/Gallo2011-Soros2013-Yun2017/libBarcodeLocalization.so
@@ -17,19 +15,30 @@ algorithms:
   library: zamberletti_detector
   name: Zamberletti
 - args:
-    imgsz: 640
-    model_path: ./Saved Models/yolov8n_640_2cl.onnx
+    imgsz: 480
+    model_path: ./Saved Models/yolon_480_0.pt
   class: YOLO_detector
   library: ultralytics_detector
-  name: Yolo nano
+  name: Yolo Nano
 - args:
-    imgsz: 640
-    model_path: ./Saved Models/yolov8s_640_2cl.onnx
+    imgsz: 480
+    model_path: ./Saved Models/yolom_480_0.pt
   class: YOLO_detector
   library: ultralytics_detector
-  name: Yolo small
+  name: Yolo Medium
 - args:
-    model_path: ./Saved Models/Detectron2_models/model_final.pth
+    imgsz: 480
+    model_path: ./Saved Models/rtdetr_480_0.pt
+  class: RTDETR_detector
+  library: ultralytics_detector
+  name: RTDETR Large
+- args:
+    model_path: ./Saved Models/fasterRCNN_480_0.pt
   class: Detectron2_detector
   library: detectron2_detector
-  name: Faster RCNN
+  name: FASTER RCNN
+- args:
+    model_path: ./Saved Models/retinaNET_480_0.pt
+  class: Detectron2_detector
+  library: detectron2_detector
+  name: RetinaNet

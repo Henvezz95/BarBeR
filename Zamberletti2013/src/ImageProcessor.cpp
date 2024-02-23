@@ -121,6 +121,7 @@ namespace artelab
     }
 
     void ImageProcessor::locate(int* result, double* angle, int* num_results, unsigned char* img_color, int h, int w){
+        cv::setNumThreads(0);
         cv::Mat img_orig(h, w, CV_8UC3, img_color);
         
         // Apply canny

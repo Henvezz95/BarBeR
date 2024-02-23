@@ -1,10 +1,9 @@
 
-k_folds: 5
-fold_index: 0
-validation: True
-train_val_test_split: [0.6, 0.1, 0.3]
+k_folds: 5  #If 1 or less, no k-fold
+validation: True 
+train_val_test_split: [0.6, 0.1, 0.3] #If k-fold is active this is not used
 vgg_annotations_path: "./annotations/VIA/"
-annotation_files: [
+annotation_files: [ #Use empty list if you want to consider all json files in the folder
     "Artelab Extended.json",
     "Artelab.json",
     "Bodnar.json",
@@ -17,7 +16,7 @@ annotation_files: [
     "SKUU DSP Lab.json",
     "Szentandrasi-Dubska QR.json",
     "ZVZ-real.json"
-],
+]
 output_path: "./annotations/COCO/"
 images_path: "./dataset/images/"
 salt: ""

@@ -182,6 +182,88 @@ def get_coco_summary(groundtruth_bbs, detected_bbs):
         "ARlarge": ARlarge
     }
 
+def get_pixel_density_summary(groundtruth_bbs, detected_bbs, bins):
+
+    # separate bbs per image X class
+    _bbs = _group_detections(detected_bbs, groundtruth_bbs)
+
+    # pairwise ious
+    _ious = {k: _compute_ious(**v) for k, v in _bbs.items()}
+
+    def _evaluate(iou_threshold, max_dets, area_range, ppe_range):
+        # accumulate evaluations on a per-class basis
+        _evals = defaultdict(lambda: {"scores": [], "matched": [], "NP": []})
+        for img_id, class_id in _bbs:
+            ev = _evaluate_image(
+                _bbs[img_id, class_id]["dt"],
+                _bbs[img_id, class_id]["gt"],
+                _ious[img_id, class_id],
+                iou_threshold,
+                max_dets,
+                area_range,
+                ppe_range
+            )
+            acc = _evals[class_id]
+            acc["scores"].append(ev["scores"])
+            acc["matched"].append(ev["matched"])
+            acc["NP"].append(ev["NP"])
+
+        # now reduce accumulations
+        for class_id in _evals:
+            acc = _evals[class_id]
+            acc["scores"] = np.concatenate(acc["scores"])
+            acc["matched"] = np.concatenate(acc["matched"]).astype('bool')
+            acc["NP"] = np.sum(acc["NP"])
+
+        res = []
+        # run ap calculation per-class
+        for class_id in _evals:
+            ev = _evals[class_id]
+            res.append({
+                "class": class_id,
+                **_compute_ap_recall(ev["scores"], ev["matched"], ev["NP"]),
+            })
+        return res
+
+    iou_thresholds = np.linspace(0.5, 0.95, int(np.round((0.95 - 0.5) / 0.05)) + 1, endpoint=True)
+    results = []
+    for j in range(len(bins)-1):
+        scores = {
+            i: _evaluate(iou_threshold=i, max_dets=100, ppe_range=(bins[j], bins[j+1]), area_range=(0, np.inf))
+            for i in iou_thresholds
+        }
+
+        AP50 = np.mean([x['AP'] for x in scores[0.50] if x['AP'] is not None])
+        AP75 = np.mean([x['AP'] for x in scores[0.75] if x['AP'] is not None])
+        AP = np.mean([x['AP'] for k in scores for x in scores[k] if x['AP'] is not None])
+        AR100 = np.mean(
+            [x['TP'] / x['total positives'] for k in scores for x in scores[k] if x['TP'] is not None])
+
+        TP = np.zeros(len(scores))
+        FP = np.zeros(len(scores))
+        P = 0
+        for category in scores[0.5]:
+            class_id = category['class']
+            if scores[0.5][class_id]['total positives'] is not None:
+                TP += np.array([int(scores[IOU_t][class_id]['TP']) for IOU_t in scores])
+                FP += np.array([int(scores[IOU_t][class_id]['FP']) for IOU_t in scores])
+                P += int(scores[0.5][class_id]['total positives'])
+            else:
+                continue
+                
+
+        results.append({
+            "AP": AP.item() if not np.isnan(AP) else 'nan',
+            "AP50": AP50.item() if not np.isnan(AP50) else 'nan',
+            "AP75": AP75.item() if not np.isnan(AP75) else 'nan',
+            "AR100": AR100.item() if not np.isnan(AR100) else 'nan',
+            "P": P,
+            "TP": TP.tolist(),
+            "FP": FP.tolist()
+        })
+
+    return results
+
 
 
 def get_coco_summary2(groundtruth_bbs, detected_bbs):
@@ -207,7 +289,6 @@ def get_coco_summary2(groundtruth_bbs, detected_bbs):
 
     # separate bbs per image X class
     _bbs = _group_detections(detected_bbs, groundtruth_bbs)
-    print(_bbs)
 
     # pairwise ious
     _ious = {k: _compute_ious(**v) for k, v in _bbs.items()}
@@ -255,88 +336,138 @@ def get_coco_summary2(groundtruth_bbs, detected_bbs):
     }
     full50 = full[0.50]
     full75 = full[0.75]
+    class_types = [x['class'] for x in full50]
     result = {}
     
-    for class_id in range(len(full50)):
+    for class_id in range(len(class_types)):
         AP50 = full50[class_id]['AP']
         AP75 = full75[class_id]['AP']
         AP = [full[k][class_id]['AP'] for k in full if full[k][class_id] is not None]
         if AP is not None and len(AP)>0:
-            AP = np.mean(AP)
+            if AP[0] is not None:
+                AP = np.mean(AP)
+            else:
+                AP = None
+        else:
+            AP = None
 
-        TP50 = full50[class_id]['TP']
-        FP50 = full50[class_id]['FP']
-        FN50 = full50[class_id]['total positives'] - full50[class_id]['TP']
-        TP75 = full75[class_id]['TP']
-        FP75 = full75[class_id]['FP']
-        FN75 = full75[class_id]['total positives'] - full75[class_id]['TP']
+        TP = [int(full[IOU_t][class_id]['TP']) for IOU_t in full if full[IOU_t][class_id]['TP'] is not None]
+        FP = [int(full[IOU_t][class_id]['FP']) for IOU_t in full if full[IOU_t][class_id]['TP'] is not None]
+
         P = full50[class_id]['total positives']
-
-
+        if P is not None:
+            P = int(P)
+            FN = [int(P-TP_i) for TP_i in TP if TP_i is not None]
+            Recall = [TP_i/P for TP_i in TP if TP_i is not None]
+            Precision = []
+            for i, TP_i in enumerate(TP):
+                if TP_i is not None:
+                    if TP_i + FP[i] > 0:
+                        Precision.append(TP_i/(TP_i+FP[i]))
+                    else:
+                        Precision.append(-1)
+            F1 = [(2*Precision[i]*Recall[i]/(Precision[i]+Recall[i])) for i in range(len(TP)) if (Precision[i]+Recall[i])>0]
+        else:
+            P = None
+            FN = []
+            Recall = []
+            Precision = []
+            F1 = []
+        
         # max recall for 100 dets can also be calculated here
-        AR100 = [full[k][class_id]['TP'] / full[k][class_id]['total positives'] for k in full]
-        if AR100 is not None and len(AR100)>0:
+        if P is None:
+            AR100 = None
+        else:
+            AR100 = [full[k][class_id]['TP'] / full[k][class_id]['total positives'] for k in full]
             AR100 = np.mean(AR100)
-
+            
         small = {
             i: _evaluate(iou_threshold=i, max_dets=100, area_range=(0, 32**2))
             for i in iou_thresholds
         }
-        APsmall = np.mean([small[k][class_id]['AP'] for k in small if small[k][class_id] is not None])
-        ARsmall = np.mean([small[k][class_id]['TP'] / small[k][class_id]['total positives'] for k in small])
+        APsmall  = [small[k][class_id]['AP'] for k in small if small[k][class_id] is not None]
+        if APsmall:
+            if APsmall[0] is not None:
+                APsmall = np.mean(APsmall)
+                ARsmall = [small[k][class_id]['TP'] / small[k][class_id]['total positives'] for k in small]
+                ARsmall = np.mean(ARsmall) if ARsmall[0] is not None else None
+            else:
+                ARsmall = None
+        else:
+            APsmall = None
+            ARsmall =None
         
         medium = {
             i: _evaluate(iou_threshold=i, max_dets=100, area_range=(32**2, 96**2))
             for i in iou_thresholds
         }
-        APmedium= np.mean([medium[k][class_id]['AP'] for k in medium if medium[k][class_id] is not None])
-        ARmedium = np.mean([medium[k][class_id]['TP'] / medium[k][class_id]['total positives'] for k in medium])
+
+        APmedium  = [medium[k][class_id]['AP'] for k in medium if medium[k][class_id] is not None]
+        if APmedium:
+            if APmedium[0] is not None:
+                APmedium = np.mean(APmedium)
+                ARmedium = [medium[k][class_id]['TP'] / medium[k][class_id]['total positives'] for k in medium]
+                ARmedium = np.mean(ARmedium) if ARmedium[0] is not None else None
+            else:
+                ARmedium = None
+        else:
+            APmedium = None
+            ARmedium =None
 
         large = {
             i: _evaluate(iou_threshold=i, max_dets=100, area_range=(96**2, np.inf))
             for i in iou_thresholds
         }
-        APlarge= np.mean([large[k][class_id]['AP'] for k in large if large[k][class_id] is not None])
-        ARlarge = np.mean([large[k][class_id]['TP'] / large[k][class_id]['total positives'] for k in large])
-
+        APlarge = [large[k][class_id]['AP'] for k in large if large[k][class_id] is not None]
+        if APlarge:
+            if APlarge[0] is not None:
+                APlarge = np.mean(APlarge)
+                ARlarge = [large[k][class_id]['TP'] / large[k][class_id]['total positives'] for k in large]
+                ARlarge = np.mean(ARlarge) if ARlarge[0] is not None else None
+            else:
+                ARlarge = None
+        else:
+            APlarge = None
+            ARlarge =None
+       
         max_det1 = {
             i: _evaluate(iou_threshold=i, max_dets=1, area_range=(0, np.inf))
             for i in iou_thresholds
         }
-        AR1 = np.mean([max_det1[k][class_id]['TP'] / max_det1[k][class_id]['total positives'] for k in max_det1])
+        if max_det1[0.50][class_id]['total positives'] is not None:
+            AR1 = np.mean([max_det1[k][class_id]['TP'] / max_det1[k][class_id]['total positives'] for k in max_det1])
+        else:
+            AR1 = None
 
-        max_det10 = {
-            i: _evaluate(iou_threshold=i, max_dets=10, area_range=(0, np.inf))
-            for i in iou_thresholds
-        }
-        AR10 = np.mean([max_det10[k][class_id]['TP'] / max_det10[k][class_id]['total positives'] for k in max_det10])
-        result[class_id] = {
+        result[class_types[class_id]] = {
             "AP": AP,
             "AP50": AP50,
             "AP75": AP75,
-            "TP50": TP50,
-            "FP50": FP50,
-            "FN50": FN50,
-            "TP75": TP75,
-            "FP75": FP75,
-            "FN75": FN75,
+            "TP": TP,
+            "FP": FP,
+            "FN": FN,
             "P": P,
+            "Precision": Precision,
+            "Recall": Recall,
+            "F1": F1,
             "APsmall": APsmall,
             "APmedium": APmedium,
             "APlarge": APlarge,
             "AR1": AR1,
-            "AR10": AR10,
             "AR100": AR100,
             "ARsmall": ARsmall,
             "ARmedium": ARmedium,
             "ARlarge": ARlarge
         }
     result['All_classes'] = {}
-    for key in result[0]:
-        if key in ['TP50', 'TP75', 'FP50', 'FP75', 'FN50', 'FN75', 'P']:
-            result['All_classes'][key] = np.sum([result[class_id][key] for class_id in range(len(full50))])
+    for key in result[class_types[0]]:
+        tmp = [result[class_id][key] for class_id in class_types]
+        tmp = list(filter(lambda x: x is not None, tmp))
+        tmp = list(filter(lambda x: not isinstance(x, list), tmp))
+        if key in ['TP','FP','FN','TP50', 'TP75', 'FP50', 'FP75', 'FN50', 'FN75', 'P']:
+            result['All_classes'][key] = np.sum(tmp)
         else:
-            result['All_classes'][key] = np.mean([result[class_id][key] for class_id in range(len(full50))])
+            result['All_classes'][key] = np.mean(tmp)
     return result
 
 def get_coco_metrics(
@@ -344,6 +475,7 @@ def get_coco_metrics(
         detected_bbs,
         iou_threshold=0.5,
         area_range=(0, np.inf),
+        ppe_range=(-np.inf, np.inf),
         max_dets=100,
 ):
     """ Calculate the Average Precision and Recall metrics as in COCO's official implementation
@@ -395,6 +527,7 @@ def get_coco_metrics(
             iou_threshold,
             max_dets,
             area_range,
+            ppe_range
         )
         acc = _evals[class_id]
         acc["scores"].append(ev["scores"])
@@ -468,7 +601,7 @@ def _compute_ious(dt, gt):
     return ious
 
 
-def _evaluate_image(dt, gt, ious, iou_threshold, max_dets=None, area_range=None):
+def _evaluate_image(dt, gt, ious, iou_threshold, max_dets=None, area_range=None, ppe_range=None):
     """ use COCO's method to associate detections to ground truths """
     # sort dts by increasing confidence
     dt_sort = np.argsort([-d.get_confidence() for d in dt], kind="stable")
@@ -478,12 +611,15 @@ def _evaluate_image(dt, gt, ious, iou_threshold, max_dets=None, area_range=None)
     ious = ious[dt_sort[:max_dets]]
 
     # generate ignored gt list by area_range
-    def _is_ignore(bb):
+    def _is_ignore(bb, area_range = None, ppe_range = None):
         if area_range is None:
-            return False
-        return not (area_range[0] <= _get_area(bb) <= area_range[1])
+            area_range = [0, np.inf]
+        if ppe_range is None:
+            ppe_range = [-np.inf, np.inf]
 
-    gt_ignore = [_is_ignore(g) for g in gt]
+        return not (area_range[0] <= _get_area(bb) <= area_range[1] and ppe_range[0]<=bb.get_ppe()<=ppe_range[1])
+
+    gt_ignore = [_is_ignore(g, area_range, ppe_range) for g in gt]
 
     # sort gts by ignore last
     gt_sort = np.argsort(gt_ignore, kind="stable")
