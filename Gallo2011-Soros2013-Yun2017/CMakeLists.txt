@@ -3,6 +3,7 @@ cmake_minimum_required(VERSION 2.8)
 project( BarcodeLocalization )
 
 find_package(OpenCV REQUIRED)
+include_directories(${OpenCV_INCLUDE_DIRS})
 
 if(OpenCV_FOUND)
     file(GLOB_RECURSE COMP_METHOD

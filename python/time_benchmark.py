@@ -4,6 +4,7 @@ import json
 import sys
 import getopt
 from tqdm import tqdm
+import os
 import torch
 
 from utility import from_np
@@ -75,6 +76,9 @@ if __name__ == "__main__":
     
     if num_threads > 0:
         torch.set_num_threads(num_threads)
+        torch.set_num_interop_threads(num_threads)
+        os.environ["OMP_NUM_THREADS"] = str(num_threads)
+        os.environ["MKL_NUM_THREADS"] = str(num_threads)
 
     with open(f'{coco_annotation_path}datasets_info.json') as json_file:
         datasets_info = json.load(json_file)
@@ -109,7 +113,7 @@ if __name__ == "__main__":
         else:
             H_new, W_new = H, W
         
-        total_area += (W_new*H_new)/10e6   
+        total_area += (W_new*H_new)/1e6   
 
         for detector_name, detector in detectors.items():
             current_times = []

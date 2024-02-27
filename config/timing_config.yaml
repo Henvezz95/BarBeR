@@ -2,9 +2,9 @@ coco_annotations_path: ./annotations/COCO/
 define: &img_size 640
 longest_edge_resize: *img_size
 num_repeats: 3
-num_threads: -1
-step: 1
-define: &device 'gpu'
+num_threads: 1
+step: 16
+define: &device 'cpu'
 
 algorithms:
 - args:
