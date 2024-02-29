@@ -18,7 +18,7 @@ class Yun_detector:
 
         start = perf_counter_ns()
         self.cdll.yunProcess(result, num_results, input_img, h,w, c_int(self.winsize))
-        self.timing = (perf_counter_ns()-start)/10e6
+        self.timing = (perf_counter_ns()-start)/1e6
         result = np.array(result).ravel()
         result = np.array(result)[:num_results[0]*4].reshape((-1,4))
         return result, ['1D']*len(result), [None]*len(result) #Boxes, classes, confidence scores

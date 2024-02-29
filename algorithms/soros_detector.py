@@ -20,24 +20,24 @@ class Soros_detector:
         if self.detectionType == '1D':
             start = perf_counter_ns()
             self.cdll.sorosProcess(result, input_img, h,w, c_bool(True), c_int(self.winsize))
-            self.timing = (perf_counter_ns()-start)/10e6
+            self.timing = (perf_counter_ns()-start)/1e6
             results = [np.array(result)]
             return results, ['1D'], [None] #Boxes, classes, confidence scores
         elif self.detectionType == '2D':
             start = perf_counter_ns()
             self.cdll.sorosProcess(result, input_img, h,w, c_bool(False), c_int(self.winsize))
-            self.timing = (perf_counter_ns()-start)/10e6
+            self.timing = (perf_counter_ns()-start)/1e6
             results = [np.array(result)]
             return results, ['2D'], [None] #Boxes, classes, confidence scores
         else:
             results = []
             start = perf_counter_ns()
             self.cdll.sorosProcess(result, input_img, h,w, c_bool(True), c_int(self.winsize))
-            self.timing = (perf_counter_ns()-start)/10e6
+            self.timing = (perf_counter_ns()-start)/1e6
             results.append(np.array(result))
             start = perf_counter_ns()
             self.cdll.sorosProcess(result, input_img, h,w, c_bool(False), c_int(self.winsize))
-            self.timing += (perf_counter_ns()-start)/10e6
+            self.timing += (perf_counter_ns()-start)/1e6
             results.append(np.array(result))
             return results, ['1D','2D'], [None, None] #Boxes, classes, confidence scores
         

@@ -5,11 +5,12 @@ from time import perf_counter_ns
 
 class Detectron2_detector:
     def __init__(self, model_path, th=0.5, device = None):
-        self.model = torch.load(model_path)
         if device in ['gpu', 'cuda']:
-            self.model.to('cuda')
+            self.model = torch.load(model_path, map_location='cuda')
+            #self.model.to('cuda')
         if device == 'cpu':
-            self.model.to('cpu')
+            self.model = torch.load(model_path, map_location='cpu')
+            #self.model.to('cpu')
         self.model.eval()
         self.th = th
         self.timing = 0
@@ -22,7 +23,7 @@ class Detectron2_detector:
         
         start = perf_counter_ns()
         results = self.model(input)[0]['instances'].get_fields()
-        self.timing = (perf_counter_ns()-start)/10e6
+        self.timing = (perf_counter_ns()-start)/1e6
         boxes = results['pred_boxes'].tensor.cpu().detach().numpy()
         predictions = results['pred_classes'].cpu().detach().numpy()
         confidences = results['scores'].cpu().detach().numpy()

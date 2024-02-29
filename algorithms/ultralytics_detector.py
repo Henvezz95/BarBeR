@@ -16,7 +16,7 @@ class YOLO_detector:
     def detect(self, img):
         start = perf_counter_ns()
         detection = self.model(img.astype('uint8'), verbose=False, imgsz=self.imgsz)
-        self.timing = (perf_counter_ns()-start)/10e6
+        self.timing = (perf_counter_ns()-start)/1e6
         names = detection[0].names
         result = []
         predictions = []

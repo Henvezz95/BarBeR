@@ -22,7 +22,7 @@ class Zamberletti_detector:
 
         start = perf_counter_ns()
         self.cdll.locateBarcode(result, angle, num_results, input_img, h,w)
-        self.timing = (perf_counter_ns()-start)/10e6
+        self.timing = (perf_counter_ns()-start)/1e6
         result = np.array(result).ravel()
         result = result[:int(num_results[0])*8].reshape((-1,4, 2))
         
