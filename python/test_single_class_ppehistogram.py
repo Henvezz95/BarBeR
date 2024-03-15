@@ -12,7 +12,7 @@ from utils.enumerators import BBType
 import yaml
 
 sys.path.append('./algorithms/') 
-bins = [-100, 0, 1, 2, 3, 4, 5, 6, 7, 100]
+bins = [-100, 0, 1,2,3,4,5,6,7,100]
 
 def parse_inputs(file_path, argv):
     config_path = None

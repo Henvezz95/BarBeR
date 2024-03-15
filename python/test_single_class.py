@@ -212,6 +212,5 @@ if __name__ == "__main__":
                 COCOevaluation = coco_evaluator.get_coco_summary2(filtered_gt, filtered_dt)
                 results['single dataset_evaluations'][detector_name][dataset_name] = {key:{k:from_np(v) for k,v in COCOevaluation[key].items()} for key in COCOevaluation}
     
-    
     with open(output_path, 'w') as outfile:
         yaml.dump(results, outfile, default_flow_style=False, sort_keys=False)
