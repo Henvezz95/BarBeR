@@ -13,6 +13,7 @@
 *        only localization method! *
 */
 
+#include <iostream>
 #include "soros.h"
 
 using namespace iy;

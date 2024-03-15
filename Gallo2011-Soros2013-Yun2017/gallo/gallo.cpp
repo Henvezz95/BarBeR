@@ -13,6 +13,7 @@
 *        only localization method! *
 */
 
+#include <iostream>
 #include "gallo.h"
 
 using namespace iy;

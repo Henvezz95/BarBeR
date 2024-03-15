@@ -13,6 +13,7 @@
 *        only localization method! *
 */
 
+#include <iostream>
 #include "yun.h"
 
 using namespace iy;

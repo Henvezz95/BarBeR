@@ -278,16 +278,6 @@ namespace artelab
             std::cout << std::setw(20) << std::left << ("Accuracy: " + tostring(res.jaccard));
             std::cout << std::setw(6) << std::left << ("Time: " + tostring(res.time)) << std::endl;
         }
-        
-        // show results
-        show_image("Prob Hough", line_image);
-        show_image("histograms smooth", feature_with_hist_smooth);
-        show_image("histograms projection", img_hist_projection);
-        show_image("Cropped", img_cropped);
-        show_image("Boundig Boxes", img_bb);
-        show_image("Original", img_orig);
-        show_image("Feature", feature_image);
-        show_image("Canny", img_canny);
 
         // saving intermediate images
         if(_output.fullPath() != "")
