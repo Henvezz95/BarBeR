@@ -101,3 +101,16 @@ def compute_1D_coverage(prediction, true_polygon):
     minX = np.min(transformed_prediction[:,0])
     maxX = np.max(transformed_prediction[:,0])
     return np.clip(maxX,0,1)-np.clip(minX,0,1)
+
+def get_contours_and_boxes(binarized_map, min_area=0):
+    assert binarized_map.dtype == np.uint8
+    contours, _ = cv2.findContours(
+        binarized_map,
+        mode=cv2.RETR_EXTERNAL,
+        method=cv2.CHAIN_APPROX_SIMPLE
+    )
+
+    contours = list(filter(lambda cnt: cv2.contourArea(cnt) > min_area, contours))
+    boxes = np.array([cv2.boundingRect(cnt) for cnt in contours])
+
+    return contours, boxes
