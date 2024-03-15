@@ -1,0 +1,15 @@
+images_path: "./dataset/images/"
+coco_annotations_path: "./annotations/COCO/"
+
+epochs: 300
+imgsz: 640
+batch : 8    
+patience: 10 
+use_ram: true
+lr: 0.001
+optimizer: 'adam' # Possible values are 'adam' or 'sgd'
+loss: 'zharkov' # Possible values are 'zharkov' and 'cross_entropy'
+
+#Only output format supported is Pytorch (.pt)
+
+
