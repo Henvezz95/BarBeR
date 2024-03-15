@@ -7,6 +7,7 @@ class Yun_detector:
         self.lib_path = lib_path
         self.winsize = winsize
         self.max_rois = max_rois
+        self.timing = 0
         self.cdll =  cdll.LoadLibrary(self.lib_path)
 
     def detect(self, img):

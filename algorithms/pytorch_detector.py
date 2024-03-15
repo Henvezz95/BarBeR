@@ -1,9 +1,9 @@
 import torch
 import numpy as np
 from time import perf_counter_ns
+    
 
-
-class Detectron2_detector:
+class Pytorch_detector:
     def __init__(self, model_path, th=0.5, device = 'cpu'):
         if device in ['gpu', 'cuda']:
             self.model = torch.load(model_path, map_location='cuda')
@@ -14,16 +14,14 @@ class Detectron2_detector:
         self.timing = 0
 
     def detect(self, img):
-        H,W,_ = img.shape
-        input = [{'image':torch.from_numpy(np.transpose(img, (2, 0, 1))), 
-         'height':H, 
-         'width':W}]
+        img_float = np.float32(img[np.newaxis,:,:,:]/255.0)
+        input = torch.from_numpy(np.transpose(img_float, (0, 3, 1, 2)))
         
         start = perf_counter_ns()
-        results = self.model(input)[0]['instances'].get_fields()
+        results = self.model(input)[0]
         self.timing = (perf_counter_ns()-start)/1e6
-        boxes = results['pred_boxes'].tensor.cpu().detach().numpy()
-        predictions = results['pred_classes'].cpu().detach().numpy()
+        boxes = results['boxes'].tensor.cpu().detach().numpy()
+        predictions = results['labels'].cpu().detach().numpy()
         confidences = results['scores'].cpu().detach().numpy()
         filtered_result = list(zip(boxes,predictions, confidences))
         filtered_result = list(filter(lambda x: x[-1] > self.th, filtered_result))
@@ -39,4 +37,3 @@ class Detectron2_detector:
     
     def get_timing(self):
         return self.timing
-    

@@ -18,7 +18,7 @@ class Gallo_detector:
 
         start = perf_counter_ns()
         self.cdll.galloProcess(result, input_img, h,w, c_int(self.winsize))
-        self.timing = (perf_counter_ns()-start)/10e6
+        self.timing = (perf_counter_ns()-start)/1e6
         result = np.array(result)
         return [result], ['1D'], [None] #Boxes, classes, confidence scores
     

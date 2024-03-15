@@ -1,10 +1,9 @@
 from ultralytics import YOLO, RTDETR
 from time import perf_counter_ns
-import torch
 
 
 class YOLO_detector:
-    def __init__(self, model_path, imgsz, device = None):
+    def __init__(self, model_path, imgsz, device = 'gpu'):
         self.model = YOLO(model_path, task='detect')
         if device in ['gpu', 'cuda']:
             self.model.to('cuda')
@@ -46,7 +45,7 @@ class RTDETR_detector:
     def detect(self, img):
         start = perf_counter_ns()
         detection = self.model(img.astype('uint8'), verbose=False, imgsz=self.imgsz)
-        self.timing = (perf_counter_ns()-start)/10e6
+        self.timing = (perf_counter_ns()-start)/1e6
         names = detection[0].names
         result = []
         predictions = []
