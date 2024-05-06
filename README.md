@@ -17,10 +17,3 @@ cmake ..
 cmake --build .
 ```
 
-# Available methods
-* Gallo2011
-* Tekin2012
-* Soros2013
-* Zamberletti2013
-* Creusot2016
-* Yun2017
