@@ -1,9 +1,9 @@
 dataset_path: "./dataset/"
-model_type: "rtdetr" #Available types are "yolo" or "rtdetr"
-pretrained_model: "rtdetr-l.pt" #yolov8n.pt"
+model_type: "yolo" #Available types are "yolo" or "rtdetr"
+pretrained_model: "yolo.yaml" #yolov8n.pt"
 args: 
-  epochs: 300
-  imgsz: 160
+  epochs: 1
+  imgsz: 640
   batch: 16 #default is 16
   patience: 10 #default is 50
   optimizer: "SGD"

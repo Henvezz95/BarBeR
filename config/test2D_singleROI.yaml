@@ -5,46 +5,11 @@ single_ROI: true
 algorithms:
 - args:
     lib_path: ./build/Gallo2011-Soros2013-Yun2017/libBarcodeLocalization.so
-    winsize: 10
+    winsize: 30
     detectionType: 2D
   class: Soros_detector
   library: soros_detector
-  name: Soros10
-- args:
-    lib_path: ./build/Gallo2011-Soros2013-Yun2017/libBarcodeLocalization.so
-    winsize: 15
-    detectionType: 2D
-  class: Soros_detector
-  library: soros_detector
-  name: Soros15
-- args:
-    lib_path: ./build/Gallo2011-Soros2013-Yun2017/libBarcodeLocalization.so
-    winsize: 20
-    detectionType: 2D
-  class: Soros_detector
-  library: soros_detector
-  name: Soros20
-- args:
-    lib_path: ./build/Gallo2011-Soros2013-Yun2017/libBarcodeLocalization.so
-    winsize: 25
-    detectionType: 2D
-  class: Soros_detector
-  library: soros_detector
-  name: Soros25
-- args:
-    lib_path: ./build/Gallo2011-Soros2013-Yun2017/libBarcodeLocalization.so
-    winsize: 31
-    detectionType: 2D
-  class: Soros_detector
-  library: soros_detector
-  name: Soros31
-- args:
-    lib_path: ./build/Gallo2011-Soros2013-Yun2017/libBarcodeLocalization.so
-    winsize: 31
-    detectionType: 1D
-  class: Soros_detector
-  library: soros_detector
-  name: Soros31_1D
+  name: Soros30
 - args:
     lib_path: ./build/Gallo2011-Soros2013-Yun2017/libBarcodeLocalization.so
     winsize: 35
@@ -60,19 +25,10 @@ algorithms:
   library: soros_detector
   name: Soros40
 - args:
-    lib_path: ./build/Gallo2011-Soros2013-Yun2017/libBarcodeLocalization.so
-    winsize: 45
-    detectionType: 2D
-  class: Soros_detector
-  library: soros_detector
-  name: Soros45
-- args:
-    lib_path: ./build/Gallo2011-Soros2013-Yun2017/libBarcodeLocalization.so
-    winsize: 50
-    detectionType: 2D
-  class: Soros_detector
-  library: soros_detector
-  name: Soros50
+    model_path: ./Saved Models/zharkov_640_4.pt
+  class: Zharkov_detector
+  library: zharkov_detector
+  name: Zharkov
 - args:
     imgsz: 640
     model_path: ./Saved Models/yolon_640_4.pt
