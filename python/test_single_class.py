@@ -206,6 +206,5 @@ if __name__ == "__main__":
             ppe_evaluation = coco_evaluator.get_pixel_density_summary(groundtruth_bbs[detector_name], detected_bbs[detector_name], bins)
         results["ppe_evaluation"][detector_name] = ppe_evaluation
     
-    
     with open(output_path, 'w') as outfile:
         yaml.dump(results, outfile, default_flow_style=False, sort_keys=False)

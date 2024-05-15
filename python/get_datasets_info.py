@@ -9,7 +9,7 @@ import numpy as np
 from tqdm import tqdm
 
 annotation_path = './annotations/COCO/datasets_info.json'
-longest_edge_resize = 320
+longest_edge_resize = 640
 single_ROI = False
 
 with open(annotation_path) as json_file:
@@ -26,6 +26,7 @@ for key, value in annotations['images'].items():
 total_images = 0
 total_1D = 0
 total_2D = 0
+k = longest_edge_resize/640
 all_sizes = []
 ppes = {'1D':[], '2D':[]}
 areas = {'1D':[], '2D':[]}
@@ -88,7 +89,7 @@ for dataset_name in dataset_dictionary:
     H_min, W_min, _ = img_min.shape
     img_max = cv2.imread("./dataset/images/"+max_size[1])
     H_max, W_max, _ = img_max.shape
-    print(os.path.basename(annotation_path), '&', len(metadata['_via_img_metadata']), '&', str(W_min)+'\\times'+str(H_min), '&',  str(W_max)+'\\times'+str(H_max), '&', num_1D, '&', num_2D)
+    print(dataset_name, '&', len(metadata['_via_img_metadata']), '&', str(W_min)+'\\times'+str(H_min), '&',  str(W_max)+'\\times'+str(H_max), '&', num_1D, '&', num_2D)
 
 print('\n')
 min_size = sorted(all_sizes, key=lambda x: x[0])[0]
@@ -98,15 +99,6 @@ H_min, W_min, _ = img_min.shape
 img_max = cv2.imread("./dataset/images/"+max_size[1])
 H_max, W_max, _ = img_max.shape
 print('Total', '&', total_images, '&', str(W_min)+'\\times'+str(H_min), '&',  str(W_max)+'\\times'+str(H_max), '&', total_1D, '&', total_2D)
-print(len(list(filter(lambda x: float(x)>0, ppes['1D']))), len(list(filter(lambda x: float(x)>0, ppes['2D']))))
-print(min(list(filter(lambda x: float(x)>0, ppes['1D']))), max(list(filter(lambda x: float(x)>0, ppes['1D']))), min(list(filter(lambda x: float(x)>0, ppes['2D']))), max(list(filter(lambda x: float(x)>0, ppes['2D']))))
-print(min(areas['1D']), max(areas['1D']), min(areas['2D']), max(areas['2D']))
-print(len(list(filter(lambda x: x<=32**2, areas['1D']))))
-print(len(list(filter(lambda x: x<=32**2, areas['2D']))))
-print(len(list(filter(lambda x: 32**2<x<=96**2, areas['1D']))))
-print(len(list(filter(lambda x: 32**2<x<=96**2, areas['2D']))))
-print(len(list(filter(lambda x: x>96**2, areas['1D']))))
-print(len(list(filter(lambda x: x>96**2, areas['2D']))))
 #matplotlib.rcParams.update({'font.size': 22})
 
 plt.rc('axes', titlesize=20)  
@@ -115,16 +107,16 @@ plt.hist(ppes['1D'], bins=25, range=[0,5])
 plt.xticks([i*0.2+0.1 for i in range(25)]) 
 plt.yticks([i*50 for i in range(18)]) 
 plt.xlabel("Pixels per module")
-plt.savefig('histogram_1D-ppe.png', dpi=240)
+plt.savefig(f'results/graphs/histogram_1D-ppe_{longest_edge_resize}.png', dpi=240)
 plt.clf()
 
 plt.hist([np.sqrt(a) for a in areas['1D']], bins=16, range=[0,512])
-plt.xticks([i*16 for i in range(33)]) 
-plt.yticks([i*50 for i in range(24)]) 
+plt.xticks([i*32 for i in range(17)]) 
+plt.yticks([i*100 for i in range(22)]) 
 plt.xlabel("Square root of area")
 plt.grid()
 plt.minorticks_on()
-plt.savefig('histogram_1D-area.png', dpi=240)
+plt.savefig(f'results/graphs/histogram_1D-area_{longest_edge_resize}.png', dpi=240)
 plt.clf()
 
 plt.rc('axes', titlesize=20)  
@@ -134,15 +126,15 @@ plt.xticks([i*0.4+0.2 for i in range(25)])
 plt.yticks([i*10 for i in range(18)]) 
 
 plt.xlabel("Pixels per module")
-plt.savefig('histogram_2D-ppe.png', dpi=240)
+plt.savefig(f'results/graphs/histogram_2D-ppe_{longest_edge_resize}.png', dpi=240)
 plt.clf()
 
 plt.hist([np.sqrt(a) for a in areas['2D']], bins=16, range=[0,512], color='red')
-plt.xticks([i*16 for i in range(33)]) 
-plt.yticks([i*5 for i in range(48)]) 
+plt.xticks([i*32 for i in range(17)]) 
+plt.yticks([i*10 for i in range(36)]) 
 plt.grid()
 plt.minorticks_on()
 plt.xlabel("Square root of area")
-plt.savefig('histogram_2D-area.png', dpi=300)
+plt.savefig(f'results/graphs/histogram_2D-area_{longest_edge_resize}.png', dpi=300)
 plt.grid(axis ='y', which='minor', color='gainsboro', linestyle='--')
 plt.clf()
