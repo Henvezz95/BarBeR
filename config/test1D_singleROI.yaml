@@ -2,6 +2,7 @@ coco_annotations_path: ./annotations/COCO/
 longest_edge_resize: 640
 class: 1D
 single_ROI: true
+bins: [-100, 0, 1,2,3,4,5,6,7,100]
 algorithms:
 - args:
     lib_path: ./build/Gallo2011-Soros2013-Yun2017/libBarcodeLocalization.so

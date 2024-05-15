@@ -69,7 +69,10 @@ if __name__ == "__main__":
     coco_annotation_path = test_config["coco_annotations_path"]
     single_code = test_config["single_ROI"]
     class_id = 1 if test_config["class"] == '1D' else 2
-    bins = test_config['bins']
+    if 'bins' in test_config:
+        bins = test_config['bins']
+    else:
+        bins = []
 
     with open(f'{coco_annotation_path}test.json') as json_file:
         coco_annotations = json.load(json_file)
