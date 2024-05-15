@@ -24,16 +24,14 @@ Once Unzipped, you will find 2 folders inside: "Annotations" and "dataset". If y
 # Folders
 * algorithms: Contains a Python class for every localization algorithm available. In particular, the available classes are:
   - detectron2_detector.py: loads a Detectron2 model in .pt or .pth format and uses it for localization
-  - gallo_detector.py: runs the 1D barcode localization method proposed by Orazio Gallo and Roberto Manduchi in the 2011 paper "Reading 1D Barcodes with Mobile Phones Using Deformable Templates"
-    
+  - gallo_detector.py: runs the 1D barcode localization method proposed by Orazio Gallo and Roberto Manduchi in the 2011 paper ["Reading 1D Barcodes with Mobile Phones Using Deformable Templates"](https://pubmed.ncbi.nlm.nih.gov/21173448/)
   - pytorch_detector.py: loads a Pytorch detection model in .pt or .pth format and uses it for localization
-  - soros_detector.py:
+  - soros_detector.py: runs the 1D and 2D barcode localization method proposed by G. Sörös and C. Flörkemeier in the 2013 paper [Blur-resistant joint 1D and 2D barcode localization for smartphones](https://dl.acm.org/doi/10.1145/2541831.2541844)
   - tekin_detector.py:
   - ultralytics_detector.py: loads an Ultralytics model (YOLO or RT-DETR supported) in .pt or .pth format and uses it for localization
   - yun_detector.py:
   - zamberletti_detector.py:
-  - zharkov_detector.py:
-    
+  - zharkov_detector.py: uses the deep-learning architecture proposed by A. Zharkov and I. Zagaynov in the 2019 paper ["Universal Barcode Detector via Semantic Segmentation"](https://arxiv.org/abs/1906.06281). The model must be a pytorch model. The class can be used for both 1D and 2D barcode detection.
 * python: contains all Python files, including all test scripts. In particular:
   -
   -
