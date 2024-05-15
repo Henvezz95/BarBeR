@@ -21,6 +21,9 @@ cmake --build .
 The dataset can be downloaded from this [Link](https://unimore365-my.sharepoint.com/:f:/g/personal/319554_unimore_it/EpO-JIoN9HlJlvLBB4cZhREBTTiScfGMg6t1s68ifrtHMQ?e=gRHz0T).
 Once Unzipped, you will find 2 folders inside: "Annotations" and "dataset". If you place these two folders directly inside the BarBeR folder there is no need to change the paths of the configuration files.
 
+# Saved Models
+One Saved Model for every architecture and scale can be downloaded form [here](https://1drv.ms/f/s!AhGbwgwB_qwFgbA0hLye0PkUnmYkVA?e=JMAX5e). Unzip the folder and place "Saved Models" directly inside the main repository folder.
+
 # Folders
 * **algorithms**: Contains a Python class for every localization algorithm available. In particular, the available classes are:
   - detectron2_detector.py: loads a Detectron2 model in .pt or .pth format and uses it for localization.
@@ -37,7 +40,7 @@ Once Unzipped, you will find 2 folders inside: "Annotations" and "dataset". If y
   - test_single_class.py: runs a set of detection algorithms on the test set considering only barcodes of one class i.e. 1D or 2D. The test measures precision, recall, F1-scores, mAP0.5, and mAP[0.5:0.95] of all methods.
   - test_multi_class.py: runs a set of detection algorithms on the test set considering all images. The test measures precision, recall, F1-scores, mAP0.5, and mAP[0.5:0.95] of all methods.
   - time_benchmark.py: runs a set of detection algorithms on the test set (or part of it) and measures the mean processing times of all methods.
-* **scripts**: contains bash scripts to run pipelines of python files (useful for k-fold cross-validation)
+* **scripts**: contains bash scripts to run pipelines of Python files (useful for k-fold cross-validation)
 * **results**: contains the results produced by running the tests. Results are divided into 2 categories:
   - reports: are .yaml files generated after running a Python test
   - graphs: are .png files representing a graph generated using one or multiple .yaml reports
