@@ -238,28 +238,13 @@ def get_pixel_density_summary(groundtruth_bbs, detected_bbs, bins):
         AP = np.mean([x['AP'] for k in scores for x in scores[k] if x['AP'] is not None])
         AR100 = np.mean(
             [x['TP'] / x['total positives'] for k in scores for x in scores[k] if x['TP'] is not None])
-
-        TP = np.zeros(len(scores))
-        FP = np.zeros(len(scores))
-        P = 0
-        for category in scores[0.5]:
-            class_id = category['class']
-            if scores[0.5][class_id]['total positives'] is not None:
-                TP += np.array([int(scores[IOU_t][class_id]['TP']) for IOU_t in scores])
-                FP += np.array([int(scores[IOU_t][class_id]['FP']) for IOU_t in scores])
-                P += int(scores[0.5][class_id]['total positives'])
-            else:
-                continue
                 
 
         results.append({
-            "AP": AP.item() if not np.isnan(AP) else 'nan',
-            "AP50": AP50.item() if not np.isnan(AP50) else 'nan',
-            "AP75": AP75.item() if not np.isnan(AP75) else 'nan',
-            "AR100": AR100.item() if not np.isnan(AR100) else 'nan',
-            "P": P,
-            "TP": TP.tolist(),
-            "FP": FP.tolist()
+            "AP": 'nan' if np.isnan(AP) else AP.item(),
+            "AP50": 'nan' if np.isnan(AP50) else AP50.item(),
+            "AP75": 'nan' if np.isnan(AP75) else AP75.item(),
+            "AR100": 'nan' if np.isnan(AR100) else AR100.item(),
         })
 
     return results
