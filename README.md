@@ -22,7 +22,7 @@ The dataset can be downloaded from this [Link](https://unimore365-my.sharepoint.
 Once Unzipped, you will find 2 folders inside: "Annotations" and "dataset". If you place these two folders directly inside the BarBeR folder there is no need to change the paths of the configuration files.
 
 # Folders
-* algorithms: Contains a Python class for every localization algorithm available. In particular, the available classes are:
+* **algorithms**: Contains a Python class for every localization algorithm available. In particular, the available classes are:
   - detectron2_detector.py: loads a Detectron2 model in .pt or .pth format and uses it for localization.
   - gallo_detector.py: runs the 1D barcode localization method proposed by Orazio Gallo and Roberto Manduchi in the 2011 paper ["Reading 1D Barcodes with Mobile Phones Using Deformable Templates"](https://pubmed.ncbi.nlm.nih.gov/21173448/).
   - pytorch_detector.py: loads a Pytorch detection model in .pt or .pth format and uses it for localization.
@@ -32,13 +32,13 @@ Once Unzipped, you will find 2 folders inside: "Annotations" and "dataset". If y
   - yun_detector.py: runs the 1D barcode localization method proposed by I. Yun and K. Joongkyu in the 2017 paper ["Vision-based 1D barcode localization method for scale and rotation invariant"](https://ieeexplore.ieee.org/abstract/document/8228227).
   - zamberletti_detector.py: runs the 1D barcode localization method proposed by A. Zamberletti et al. in the 2013 paper ["Robust Angle Invariant 1D Barcode Detection"](http://artelab.dista.uninsubria.it/res/research/papers/2013/2013_zamberletti_acpr.pdf).
   - zharkov_detector.py: uses the deep-learning architecture proposed by A. Zharkov and I. Zagaynov in the 2019 paper ["Universal Barcode Detector via Semantic Segmentation"](https://arxiv.org/abs/1906.06281). The model must be a Pytorch model. The class can be used for both 1D and 2D barcode detection.
-* config: contains the .yaml configuration files for each Python script that needs a configuration file. These configuration files are examples and can be modified depending on the configuration needed.
-* python: contains all Python files, including all test scripts. In particular:
+* **config**: contains the .yaml configuration files for each Python script that needs a configuration file. These configuration files are examples and can be modified depending on the configuration needed.
+* **python**: contains all Python files, including all test scripts. In particular:
   - test_single_class.py: runs a set of detection algorithms on the test set considering only barcodes of one class i.e. 1D or 2D. The test measures precision, recall, F1-scores, mAP0.5, and mAP[0.5:0.95] of all methods.
   - test_multi_class.py: runs a set of detection algorithms on the test set considering all images. The test measures precision, recall, F1-scores, mAP0.5, and mAP[0.5:0.95] of all methods.
   - time_benchmark.py: runs a set of detection algorithms on the test set (or part of it) and measures the mean processing times of all methods.
-* scripts: contains bash scripts to run pipelines of python files (useful for k-fold cross-validation)
-* results: contains the results produced by running the tests. Results are divided into 2 categories:
+* **scripts**: contains bash scripts to run pipelines of python files (useful for k-fold cross-validation)
+* **results**: contains the results produced by running the tests. Results are divided into 2 categories:
   - reports: are .yaml files generated after running a Python test
   - graphs: are .png files representing a graph generated using one or multiple .yaml reports
 
