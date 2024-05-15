@@ -187,7 +187,6 @@ if __name__ == "__main__":
                "num_labels":num_labels, 
                "total_area": float(total_area), 
                "GT_area": float(GT_area), 
-               "bins": bins,
                "evaluation":{},
                "ppe_evaluation": {}}
     
