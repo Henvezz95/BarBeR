@@ -25,6 +25,7 @@ Once Unzipped, you will find 2 folders inside: "Annotations" and "dataset". If y
 * algorithms: Contains a Python class for every localization algorithm available. In particular, the available classes are:
   - detectron2_detector.py: loads a Detectron2 model in .pt or .pth format and uses it for localization
   - gallo_detector.py: runs the 1D barcode localization method proposed by Orazio Gallo and Roberto Manduchi in the 2011 paper "Reading 1D Barcodes with Mobile Phones Using Deformable Templates"
+    
   - pytorch_detector.py: loads a Pytorch detection model in .pt or .pth format and uses it for localization
   - soros_detector.py:
   - tekin_detector.py:
@@ -32,6 +33,7 @@ Once Unzipped, you will find 2 folders inside: "Annotations" and "dataset". If y
   - yun_detector.py:
   - zamberletti_detector.py:
   - zharkov_detector.py:
+    
 * python: contains all Python files, including all test scripts. In particular:
   -
   -
