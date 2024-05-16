@@ -8,20 +8,20 @@ define: &device 'cpu'
 
 algorithms:
 - args:
-    model_path: ./Saved Models/zharkov_640_4.pt
+    model_path: ./Saved Models/zharkov_640_0.pt
   class: Zharkov_detector
   library: zharkov_detector
   name: Zharkov
   device: *device
 - args:
-    model_path: ./Saved Models/fasterRCNN_640_4.pt
+    model_path: ./Saved Models/fasterRCNN_640_0.pt
     device: *device
   class: Detectron2_detector
   library: detectron2_detector
   name: FASTER RCNN
 - args:
     imgsz: *img_size
-    model_path: ./Saved Models/yolon_640_4.pt
+    model_path: ./Saved Models/yolon_640_0.pt
     device: *device
   class: YOLO_detector
   library: ultralytics_detector
@@ -35,20 +35,20 @@ algorithms:
   name: Yolo Pico Ghost
 - args:
     imgsz: *img_size
-    model_path: ./Saved Models/yolom_640_4.pt
+    model_path: ./Saved Models/yolom_640_0.pt
     device: *device
   class: YOLO_detector
   library: ultralytics_detector
   name: Yolo Medium
 - args:
     imgsz: *img_size
-    model_path: ./Saved Models/rtdetr_640_4.pt
+    model_path: ./Saved Models/rtdetr_640_0.pt
     device: *device
   class: RTDETR_detector
   library: ultralytics_detector
   name: RTDETR Large
 - args:
-    model_path: ./Saved Models/retinaNET_640_4.pt
+    model_path: ./Saved Models/retinaNET_640_0.pt
     device: *device
   class: Detectron2_detector
   library: detectron2_detector
