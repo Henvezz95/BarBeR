@@ -3,13 +3,14 @@ import numpy as np
 import matplotlib.pyplot as plt
 from glob import glob
 
-results_path = glob('./results/reports/test1D_singleROI_640*.yaml')
-type = '1D'
+base_path = './results/reports/test1D_singleROI_640'
+results_path = glob(f'{base_path}*.yaml')
+ttype = '1D'
 draw_ppe_graph =  True
 
-if type == '1D':
+if ttype == '1D':
     c = 0
-elif type == '2D':
+elif ttype == '2D':
     c = 1 
 
 results = {}
