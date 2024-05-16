@@ -49,12 +49,18 @@ The repository has been developed with Linux as the main target OS. However, it 
   - reports: are .yaml files generated after running a Python test
   - graphs: are .png files representing a graph generated using one or multiple .yaml reports
  
+All other folders are needed to compile the necessary libraries when building the repository.
+ 
 # Generate Train-Test Split Annotations
 For a test we need COCO annotations divided into train.json, val.json, and test.json. To configure how to split the annotations, we use a configuration file. An example is ```config/generate_coco_annotations_config.yaml```. With the configuration file, we can select which files to use and which annotations, the train-test split size, and if we are using K-fold cross-validation.
 The script used to generate the annotation is ```python/generate_coco_annotations.py```, which takes as input a configuration file and optionally the index k, which indicates the index of the current cross-validation test.
-```python3 python/generate_coco_annotations.py -c ./config/generate_coco_annotations_config.yaml  -k 0```
+
+```
+python3 python/generate_coco_annotations.py -c ./config/generate_coco_annotations_config.yaml  -k 0
+```
 
 If we also need to train an Ultralytics model, we need YOLO annotations, which will be generated with the following command:
-```python3 python/convert_coco_to_yolo.py -c ./annotations/COCO/ -o "./dataset/```
 
-All other folders are needed to compile the necessary libraries when building the repository.
+```
+python3 python/convert_coco_to_yolo.py -c ./annotations/COCO/ -o "./dataset/
+```
