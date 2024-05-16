@@ -15,18 +15,9 @@ if __name__ == "__main__":
 
     yaml_dictionary = {'coco_annotations_path': './annotations/COCO/',
     'longest_edge_resize': img_size,
-    'class': '2D',
+    'class': '1D',
     'single_ROI': True,
     'algorithms':[
-        {
-            'args': {
-                'lib_path': './build/Gallo2011-Soros2013-Yun2017/libBarcodeLocalization.so',
-                'winsize': 10
-            },
-            'class': 'Gallo_detector',
-            'library': 'gallo_detector',
-            'name': 'Gallo10'
-        },
         {
             'args': {
                 'lib_path': './build/Gallo2011-Soros2013-Yun2017/libBarcodeLocalization.so',
@@ -35,51 +26,6 @@ if __name__ == "__main__":
             'class': 'Gallo_detector',
             'library': 'gallo_detector',
             'name': 'Gallo15'
-        },
-        {
-            'args': {
-                'lib_path': './build/Gallo2011-Soros2013-Yun2017/libBarcodeLocalization.so',
-                'winsize': 20
-            },
-            'class': 'Gallo_detector',
-            'library': 'gallo_detector',
-            'name': 'Gallo20'
-        },
-        {
-            'args': {
-                'lib_path': './build/Gallo2011-Soros2013-Yun2017/libBarcodeLocalization.so',
-                'winsize': 25
-            },
-            'class': 'Gallo_detector',
-            'library': 'gallo_detector',
-            'name': 'Gallo25'
-        },
-        {
-            'args': {
-                'lib_path': './build/Gallo2011-Soros2013-Yun2017/libBarcodeLocalization.so',
-                'winsize': 30
-            },
-            'class': 'Gallo_detector',
-            'library': 'gallo_detector',
-            'name': 'Gallo30'
-        },
-        {
-            'args': {
-                'lib_path': './build/Gallo2011-Soros2013-Yun2017/libBarcodeLocalization.so',
-                'winsize': 35
-            },
-            'class': 'Gallo_detector',
-            'library': 'gallo_detector',
-            'name': 'Gallo35'
-        },
-        {
-            'args': {
-                'lib_path': './build/Gallo2011-Soros2013-Yun2017/libBarcodeLocalization.so',
-                'winsize': 10
-            },
-            'class': 'Soros_detector',
-            'library': 'soros_detector',
-            'name': 'Soros10'
         },
         {
             'args': {
@@ -93,83 +39,11 @@ if __name__ == "__main__":
         {
             'args': {
                 'lib_path': './build/Gallo2011-Soros2013-Yun2017/libBarcodeLocalization.so',
-                'winsize': 20
-            },
-            'class': 'Soros_detector',
-            'library': 'soros_detector',
-            'name': 'Soros20'
-        },
-        {
-            'args': {
-                'lib_path': './build/Gallo2011-Soros2013-Yun2017/libBarcodeLocalization.so',
-                'winsize': 25
-            },
-            'class': 'Soros_detector',
-            'library': 'soros_detector',
-            'name': 'Soros25'
-        },
-        {
-            'args': {
-                'lib_path': './build/Gallo2011-Soros2013-Yun2017/libBarcodeLocalization.so',
-                'winsize': 31
-            },
-            'class': 'Soros_detector',
-            'library': 'soros_detector',
-            'name': 'Soros31'
-        },
-        {
-            'args': {
-                'lib_path': './build/Gallo2011-Soros2013-Yun2017/libBarcodeLocalization.so',
-                'winsize': 210
-            },
-            'class': 'Yun_detector',
-            'library': 'yun_detector',
-            'name': 'Yun10'
-        },
-        {
-            'args': {
-                'lib_path': './build/Gallo2011-Soros2013-Yun2017/libBarcodeLocalization.so',
-                'winsize': 15
-            },
-            'class': 'Yun_detector',
-            'library': 'yun_detector',
-            'name': 'Yun15'
-        },
-        {
-            'args': {
-                'lib_path': './build/Gallo2011-Soros2013-Yun2017/libBarcodeLocalization.so',
-                'winsize': 20 
-            },
-            'class': 'Yun_detector',
-            'library': 'yun_detector',
-            'name': 'Yun'
-        },
-        {
-            'args': {
-                'lib_path': './build/Gallo2011-Soros2013-Yun2017/libBarcodeLocalization.so',
-                'winsize': 25
-            },
-            'class': 'Yun_detector',
-            'library': 'yun_detector',
-            'name': 'Yun25'
-        },
-        {
-            'args': {
-                'lib_path': './build/Gallo2011-Soros2013-Yun2017/libBarcodeLocalization.so',
                 'winsize': 30
             },
             'class': 'Yun_detector',
             'library': 'yun_detector',
             'name': 'Yun30'
-        },
-        {
-            'args': {
-                'lib_path': './build/Gallo2011-Soros2013-Yun2017/libBarcodeLocalization.so',
-                'winsize': 35
-            },
-            'class': 'Yun_detector',
-            'library': 'yun_detector',
-            'name': 'Yun35'
         },
         {
             'args': {

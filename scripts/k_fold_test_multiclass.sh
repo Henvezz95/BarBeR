@@ -1,4 +1,4 @@
-IMAGE_SIZE=480
+IMAGE_SIZE=640
 echo "Image size: ${IMAGE_SIZE}"
 
 for i in {0..4}

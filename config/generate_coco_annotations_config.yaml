@@ -1,5 +1,5 @@
 
-k_folds: 0  #If 0 or less, no k-fold
+k_folds: 1  #Number of dataset subdivision when using K-fold validation. If 1 or less, no k-fold
 validation: True #Adds validation split
 train_val_test_split: [0.6, 0.1, 0.3]
 vgg_annotations_path: "./annotations/VIA/"
