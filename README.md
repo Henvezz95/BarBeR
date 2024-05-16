@@ -76,4 +76,11 @@ Example multi-class detection Test:
 python3 python/test_multi_class.py -c "./config/test_multiclass.yaml" -o "./results/reports/test_multiclass_640_0"
 ```
 
+# Time Benchmark
+The Time Benchmark is used to measure the processing time of different localization methods. In this case, the test runs on all images of the dataset, comprising the training set, validation set, and test set.
+The script to perform a timing test is ```time_benchmark.py``` and the required inputs are a path to a configuration file and a path to the destination folder for the generated report. A configuration file example is ```config/timing_config.yaml```. 
 
+Example Timing Benchmark:
+```
+python3 python/time_benchmark.py -c "./config/timing_config.yaml" -o "./results/reports/test_time_640_0"
+```
