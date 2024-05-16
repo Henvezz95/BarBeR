@@ -2,10 +2,10 @@ dataset_path: "./dataset/"
 model_type: "yolo" #Available types are "yolo" or "rtdetr"
 pretrained_model: "yolo.yaml" #yolov8n.pt"
 args: 
-  epochs: 1
-  imgsz: 640
-  batch: 16 #default is 16
-  patience: 10 #default is 50
+  epochs: 300 #Num epochs
+  imgsz: 640 #Image size (longest edge in pixels)
+  batch: 16 #batch size - default is 16
+  patience: 10 # default is 50 -used in early stopping
   optimizer: "SGD"
   scale: 0.0 #default is 0.5
   mosaic: 0.0 #default is 1.0
