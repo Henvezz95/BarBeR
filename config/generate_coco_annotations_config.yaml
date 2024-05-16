@@ -1,7 +1,7 @@
 
-k_folds: 5  #If 1 or less, no k-fold
-validation: True 
-train_val_test_split: [0.6, 0.1, 0.3] #If k-fold is active this is not used
+k_folds: 0  #If 0 or less, no k-fold
+validation: True #Adds validation split
+train_val_test_split: [0.6, 0.1, 0.3]
 vgg_annotations_path: "./annotations/VIA/"
 annotation_files: [ #Use empty list if you want to consider all json files in the folder
     "Artelab Extended.json",
@@ -19,4 +19,4 @@ annotation_files: [ #Use empty list if you want to consider all json files in th
 ]
 output_path: "./annotations/COCO/"
 images_path: "./dataset/images/"
-salt: ""
+salt: "" #Files are split into train and test set depending on their name. Adding salt (must be a string) is equivalent to changing the seed of the random split
