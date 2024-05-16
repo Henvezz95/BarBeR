@@ -24,6 +24,9 @@ Once Unzipped, you will find 2 folders inside: "Annotations" and "dataset". If y
 # Saved Models
 One Saved Model for every architecture and scale can be downloaded form [here](https://1drv.ms/f/s!AhGbwgwB_qwFgbA0hLye0PkUnmYkVA?e=JMAX5e). Unzip the folder and place "Saved Models" directly inside the main repository folder.
 
+# Compatibility
+The repository has been developed with Linux as the main target OS. However, it should be possible to build the project also on Windows. The code is not architecture-specific and it's possible to build and run all the tests on different architectures. Both x86-64 and ARM architectures have been tested without any reported issues.
+
 # Folders
 * **algorithms**: Contains a Python class for every localization algorithm available. In particular, the available classes are:
   - detectron2_detector.py: loads a Detectron2 model in .pt or .pth format and uses it for localization.
