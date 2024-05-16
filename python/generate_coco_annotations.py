@@ -2,7 +2,7 @@ import json
 import cv2
 import hashlib
 import os
-from utility import GetAreaOfPolyGon, get_segmenation
+from python.utils.utility import GetAreaOfPolyGon, get_segmenation
 import datetime
 from tqdm import tqdm
 from glob import glob

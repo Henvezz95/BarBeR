@@ -30,7 +30,7 @@ def get_coco_summary(groundtruth_bbs, detected_bbs):
         AR1, AR10, AR100,
         APsmall, APmedium, APlarge,
         ARsmall, ARmedium, ARlarge.
-
+        Plus the number of True Positives, False Positives and False Negatives.
         When no ground-truth can be associated with a particular class (NPOS == 0),
         that class is removed from the average calculation.
         If for a given calculation, no metrics whatsoever are available, returns NaN.
@@ -252,25 +252,6 @@ def get_pixel_density_summary(groundtruth_bbs, detected_bbs, bins):
 
 
 def get_coco_summary2(groundtruth_bbs, detected_bbs):
-    """Calculate the 12 standard metrics used in COCOEval,
-        AP, AP50, AP75,
-        AR1, AR10, AR100,
-        APsmall, APmedium, APlarge,
-        ARsmall, ARmedium, ARlarge.
-
-        When no ground-truth can be associated with a particular class (NPOS == 0),
-        that class is removed from the average calculation.
-        If for a given calculation, no metrics whatsoever are available, returns NaN.
-
-    Parameters
-        ----------
-            groundtruth_bbs : list
-                A list containing objects of type BoundingBox representing the ground-truth bounding boxes.
-            detected_bbs : list
-                A list containing objects of type BoundingBox representing the detected bounding boxes.
-    Returns:
-            A dictionary with one entry for each metric.
-    """
 
     # separate bbs per image X class
     _bbs = _group_detections(detected_bbs, groundtruth_bbs)
@@ -463,38 +444,6 @@ def get_coco_metrics(
         ppe_range=(-np.inf, np.inf),
         max_dets=100,
 ):
-    """ Calculate the Average Precision and Recall metrics as in COCO's official implementation
-        given an IOU threshold, area range and maximum number of detections.
-    Parameters
-        ----------
-            groundtruth_bbs : list
-                A list containing objects of type BoundingBox representing the ground-truth bounding boxes.
-            detected_bbs : list
-                A list containing objects of type BoundingBox representing the detected bounding boxes.
-            iou_threshold : float
-                Intersection Over Union (IOU) value used to consider a TP detection.
-            area_range : (numerical x numerical)
-                Lower and upper bounds on annotation areas that should be considered.
-            max_dets : int
-                Upper bound on the number of detections to be considered for each class in an image.
-
-    Returns:
-            A list of dictionaries. One dictionary for each class.
-            The keys of each dictionary are:
-            dict['class']: class representing the current dictionary;
-            dict['precision']: array with the precision values;
-            dict['recall']: array with the recall values;
-            dict['AP']: average precision;
-            dict['interpolated precision']: interpolated precision values;
-            dict['interpolated recall']: interpolated recall values;
-            dict['total positives']: total number of ground truth positives;
-            dict['TP']: total number of True Positive detections;
-            dict['FP']: total number of False Positive detections;
-
-            if there was no valid ground truth for a specific class (total positives == 0),
-            all the associated keys default to None
-    """
-
     # separate bbs per image X class
     _bbs = _group_detections(detected_bbs, groundtruth_bbs)
 
