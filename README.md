@@ -64,3 +64,13 @@ If we also need to train an Ultralytics model, we need YOLO annotations, which w
 ```
 python3 python/convert_coco_to_yolo.py -c ./annotations/COCO/ -o "./dataset/
 ```
+
+# Test Single-Class Detection Test
+The Python script that runs the Single-Class detection test is ```test_single_class.py```. The inputs are a configuration file and a path to the result report destination. In this repository, there are three working examples of configuration files, one for single-ROI 1D barcode detection (```./config/test1D_singleROI.yaml```), one for multi-ROI 1D barcode detection (```./config/test1D_multiROI.yaml```), and one for single-ROI 2D barcode detection (```./config/test1D_singleROI.yaml```).
+
+Example of 1D single-ROI Test:
+```
+python3 python/test_single_class.py -c "./config/test1D_singleROI.yaml" -o "./results/reports/test1D_singleROI_640_0"
+```
+
+
