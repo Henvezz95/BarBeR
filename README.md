@@ -16,6 +16,10 @@ cd build
 cmake ..
 cmake --build .
 ```
+To install all required Python libraries run this command:
+```
+pip install -r requirements.txt
+```
 
 # Download the Dataset
 The dataset can be downloaded from this [Link](https://unimore365-my.sharepoint.com/:f:/g/personal/319554_unimore_it/EpO-JIoN9HlJlvLBB4cZhREBTTiScfGMg6t1s68ifrtHMQ?e=gRHz0T).
