@@ -93,9 +93,9 @@ To change the path of the input reports, change the variable 'base_path' present
 
 # Train a deep-learning model
 To train a model with Ultralytics run ```python/ultralytics_trainer.py```. A configuration file is needed (e.g. ```config/ultralytics_training_config.yaml```), as well as an output path for the trained model (Default is Saved Models).
-<\br>
+</br>
 To train a model with Detectron2 run ```python/detectron2_trainer.py```. A configuration file is needed (e.g. ```config/detectron2_training_config.yaml```), as well as an output path for the trained model (Default is Saved Models).
-<\br>
+</br>
 To train a Zharkov model run ```Zharkov2019/zharkov_trainer.py```. A configuration file is needed (e.g. ```config/zharkov_training_config.yaml```), as well as an output path for the trained model (Default is Saved Models).
 
 # K-fold cross-validation
