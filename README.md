@@ -135,24 +135,6 @@ source scripts/k_fold_test_multiclass.sh
 * **get_timing** returns the processing time of the last detection in milliseconds. The use of ```perf_counter_ns``` is advised, because it has a [high resolution](https://peps.python.org/pep-0564/#annex-clocks-resolution-in-python) (around 100ns) on both Linux and Windows. The output of ```perf_counter_ns``` should then be divided by 1e6.
   
  ```python
-# Abstract Class definition
-class BaseDetector(ABC):
-    @abstractmethod
-    def detect(self, img:npt.NDArray) -> tuple[list[npt.NDArray], list[str], list[float | int | None]]:
-        '''
-        The detect method operates on a single image, in numpy array format
-        The detect method has 3 outputs:
-            - List of detected Bounding Boxes
-            - List with the classes corresponding to each detection. Classes are strings ('1D', '2D', other)
-            - List of confidence scores for each detection (if no confidence is available, it will be a None value)
-        '''
-        pass
-
-    @abstractmethod
-    def get_timing(self) -> int | float:
-        pass
-```
- ```python
 # Defining the new class inside new_algorithm.py
 from detectors_abs import BaseDetector
 
