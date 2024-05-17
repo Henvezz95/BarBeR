@@ -126,3 +126,41 @@ Example run 5 multi-class tests:
 ```
 source scripts/k_fold_test_multiclass.sh
 ```
+
+# Testing a New Localization Algorithm
+* The localization method must be defined inside a new python file (e.g. ```new_algorithm.py```) and the file must be placed inside the ```algorithms``` folder
+* Define a class with the implementation of the algorithm. To ensure compatibility, the new class should inherit from the abstract class "BaseDetector" defined in ```algorithms/detectors_abs.py```
+* A detector must have at least these two methods: detect and get_timing
+* **detect works** on a single image and outputs a list of detected bounding boxes, a list with the classes of the detections, and a list of confidence scores (between 0 and 1 if available, otherwise None)
+* **get_timing** returns the processing time of the last detection in milliseconds. The use of ```perf_counter_ns``` is advised, because it has a higher resolution than other time measurement methods on both Linux and Windows. The output of ```perf_counter_ns``` should then be divided by 1e6.
+  
+ ```python
+# Abstract Class definition
+class BaseDetector(ABC):
+    @abstractmethod
+    def detect(self, img:npt.NDArray) -> tuple[list[npt.NDArray], list[str], list[float | int | None]]:
+        '''
+        The detect method operates on a single image, in numpy array format
+        The detect method has 3 outputs:
+            - List of detected Bounding Boxes
+            - List with the classes corresponding to each detection. Classes are strings ('1D', '2D', other)
+            - List of confidence scores for each detection (if no confidence is available, it will be a None value)
+        '''
+        pass
+
+    @abstractmethod
+    def get_timing(self) -> int | float:
+        pass
+```
+ ```python
+# Defining the new class inside new_algorithm.py
+from detectors_abs import BaseDetector
+
+class NewDetector(BaseDetector):
+  def __init__():
+    ...
+  def detect(self, img):
+    ...
+  def get_timing(self):
+    ...
+```
