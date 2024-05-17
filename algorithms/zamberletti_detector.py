@@ -2,8 +2,9 @@ from ctypes import *
 import numpy as np
 import cv2
 from time import perf_counter_ns
+from detectors_abs import BaseDetector
 
-class Zamberletti_detector:
+class Zamberletti_detector(BaseDetector):
     def __init__(self, lib_path, net_path='./Zamberletti2013/net61x3.net', winsize=20, max_rois=50):
         self.lib_path = lib_path
         self.winsize = winsize

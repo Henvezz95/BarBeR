@@ -1,8 +1,9 @@
 from ultralytics import YOLO, RTDETR
 from time import perf_counter_ns
+from detectors_abs import BaseDetector
 
 
-class YOLO_detector:
+class YOLO_detector(BaseDetector):
     def __init__(self, model_path, imgsz, device = 'gpu'):
         self.model = YOLO(model_path, task='detect')
         if device in ['gpu', 'cuda']:
@@ -32,7 +33,7 @@ class YOLO_detector:
     def get_timing(self):
         return self.timing
     
-class RTDETR_detector:
+class RTDETR_detector(BaseDetector):
     def __init__(self, model_path, imgsz, device = None):
         self.model = RTDETR(model_path)
         if device in ['gpu', 'cuda']:

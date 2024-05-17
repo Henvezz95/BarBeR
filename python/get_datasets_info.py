@@ -1,12 +1,8 @@
 import json
-import yaml
 import cv2
-import os
 from glob import glob
 import matplotlib.pyplot as plt
-import matplotlib
 import numpy as np
-from tqdm import tqdm
 
 annotation_path = './annotations/COCO/datasets_info.json'
 longest_edge_resize = 640

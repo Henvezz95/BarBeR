@@ -1,9 +1,10 @@
 import torch
 import numpy as np
 from time import perf_counter_ns
+from detectors_abs import BaseDetector
     
 
-class Pytorch_detector:
+class Pytorch_detector(BaseDetector):
     def __init__(self, model_path, th=0.5, device = 'cpu'):
         if device in ['gpu', 'cuda']:
             self.model = torch.load(model_path, map_location='cuda')

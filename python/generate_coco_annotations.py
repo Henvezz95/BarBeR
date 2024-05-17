@@ -2,7 +2,7 @@ import json
 import cv2
 import hashlib
 import os
-from python.utils.utility import GetAreaOfPolyGon, get_segmenation
+from utils.utility import GetAreaOfPolyGon, get_segmenation
 import datetime
 from tqdm import tqdm
 from glob import glob
@@ -15,18 +15,16 @@ def create_image_info(image_id, file_name, image_size,
                       date_captured=datetime.datetime.utcnow().isoformat(' '),
                       license_id=1, coco_url="", flickr_url=""):
 
-    image_info = {
-            "id": image_id,
-            "file_name": file_name,
-            "width": image_size[0],
-            "height": image_size[1],
-            "date_captured": date_captured,
-            "license": license_id,
-            "coco_url": coco_url,
-            "flickr_url": flickr_url
+    return {
+        "id": image_id,
+        "file_name": file_name,
+        "width": image_size[0],
+        "height": image_size[1],
+        "date_captured": date_captured,
+        "license": license_id,
+        "coco_url": coco_url,
+        "flickr_url": flickr_url,
     }
-
-    return image_info
 
 def create_annotation_info(annotation_id, image_id, category_id, is_crowd,
                            area, bounding_box, segmentation):

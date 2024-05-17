@@ -1,8 +1,9 @@
 from ctypes import *
 import numpy as np
 from time import perf_counter_ns
+from detectors_abs import BaseDetector
 
-class Yun_detector:
+class Yun_detector(BaseDetector):
     def __init__(self, lib_path, winsize=20, max_rois=50):
         self.lib_path = lib_path
         self.winsize = winsize

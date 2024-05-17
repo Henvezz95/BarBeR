@@ -28,13 +28,6 @@ algorithms:
   name: Yolo Nano
 - args:
     imgsz: *img_size
-    model_path: ./Saved Models/yolopico_ghost_640_0.pt
-    device: *device
-  class: YOLO_detector
-  library: ultralytics_detector
-  name: Yolo Pico Ghost
-- args:
-    imgsz: *img_size
     model_path: ./Saved Models/yolom_640_0.pt
     device: *device
   class: YOLO_detector

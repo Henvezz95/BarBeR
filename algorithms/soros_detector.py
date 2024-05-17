@@ -1,8 +1,9 @@
 from ctypes import *
 import numpy as np
 from time import perf_counter_ns
+from detectors_abs import BaseDetector
 
-class Soros_detector:
+class Soros_detector(BaseDetector):
     def __init__(self, lib_path, winsize=20, max_rois=50, detectionType='1D'):
         self.lib_path = lib_path
         self.winsize = winsize

@@ -3,12 +3,14 @@ import numpy as np
 import cv2
 from time import perf_counter_ns
 import sys
+from detectors_abs import BaseDetector
+
 sys.path.append('./python/') 
 sys.path.append('./Zharkov2019/') 
 from models import ZharkovDilatedNet
-from utility import get_contours_and_boxes
+from utils.utility import get_contours_and_boxes
 
-class Zharkov_detector:
+class Zharkov_detector(BaseDetector):
     def __init__(self, model_path, th=0.5, minArea=10, device = 'gpu'):
         self.model = torch.load(model_path)
         # First layer weights are scaled to operate in the range 0..255 instead of 0..1

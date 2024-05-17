@@ -8,7 +8,7 @@ from tqdm import tqdm
 from bounding_box import BoundingBox
 from evaluators import coco_evaluator
 from utils.enumerators import BBType
-from python.utils.utility import join, from_np
+from utils.utility import from_np
 import yaml
 
 sys.path.append('./algorithms/') 

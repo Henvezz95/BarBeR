@@ -1,23 +1,4 @@
-""" version ported from https://github.com/cocodataset/cocoapi/blob/master/PythonAPI/pycocotools/cocoeval.py
-
-    Notes:
-        1) The default area thresholds here follows the values defined in COCO, that is,
-        small:           area <= 32**2
-        medium: 32**2 <= area <= 96**2
-        large:  96**2 <= area.
-        If area is not specified, all areas are considered.
-
-        2) COCO's ground truths contain an 'area' attribute that is associated with the segmented area if
-        segmentation-level information exists. While coco uses this 'area' attribute to distinguish between
-        'small', 'medium', and 'large' objects, this implementation simply uses the associated bounding box
-        area to filter the ground truths.
-
-        3) COCO uses floating point bounding boxes, thus, the calculation of the box area
-        for IoU purposes is the simple open-ended delta (x2 - x1) * (y2 - y1).
-        PASCALVOC uses integer-based bounding boxes, and the area includes the outer edge,
-        that is, (x2 - x1 + 1) * (y2 - y1 + 1). This implementation assumes the open-ended (former)
-        convention for area calculation.
-"""
+""" version ported from https://github.com/cocodataset/cocoapi/blob/master/PythonAPI/pycocotools/cocoeval.py"""
 
 from collections import defaultdict
 

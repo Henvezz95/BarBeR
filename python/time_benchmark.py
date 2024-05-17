@@ -6,11 +6,6 @@ import getopt
 from tqdm import tqdm
 import os
 import torch
-
-from python.utils.utility import from_np
-from bounding_box import BoundingBox
-from evaluators import coco_evaluator
-from utils.enumerators import BBType
 import yaml
 
 sys.path.append('./algorithms/') 
