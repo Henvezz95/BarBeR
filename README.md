@@ -146,3 +146,5 @@ class NewDetector(BaseDetector):
   def get_timing(self):
     ...
 ```
+
+* To enable the new algorithm in a test, it should be added to the algorithms list in the configuration file used in the test. Check the available configuration files in the Repository for the exact syntax required
