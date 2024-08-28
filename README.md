@@ -2,7 +2,7 @@
 The repository contains multiple algorithms for 1D and 2D barcode localization proposed in different papers in the past years. The repository contains the tools to measure the performance of those algorithms
 
 
-<img src='./logo_with_name.png' width='500'>
+<img src='./logo_with_name.png'>
 
 # Installation Instructions
 To build the libraries you first need to install:
