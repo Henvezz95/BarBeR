@@ -117,9 +117,19 @@ Example train 5 Detectron2 networks:
 source scripts/k_fold_training_det.sh
 ```
 
+Example train 5 Zharkov networks:
+```
+source scripts/k_fold_training_zharkov.sh
+```
+
 Example run 5 single-class tests with 1D barcodes:
 ```
 source scripts/k_fold_test_1D_singleROI.sh
+```
+
+Example run 5 single-class tests with 2D barcodes:
+```
+source scripts/k_fold_test_2D_singleROI.sh
 ```
 
 Example run 5 multi-class tests:
