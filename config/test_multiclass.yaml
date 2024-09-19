@@ -1,12 +1,6 @@
 coco_annotations_path: ./annotations/COCO/
 longest_edge_resize: 640
-bins: [-100, 0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 100]
 algorithms:
-- args:
-    model_path: ./Saved Models/zharkov_640_0.pt
-  class: Zharkov_detector
-  library: zharkov_detector
-  name: Zharkov
 - args:
     imgsz: 640
     model_path: ./Saved Models/yolon_640_0.pt

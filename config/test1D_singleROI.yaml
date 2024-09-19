@@ -2,37 +2,8 @@ coco_annotations_path: ./annotations/COCO/
 longest_edge_resize: 640
 class: 1D
 single_ROI: true
-bins: [-100, 0, 1,2,3,4,5,6,7,100]
+bins: [-100, 0, 0.5,1.0,1.5,2.0,2.5,3.0,3.5,4.0,100]
 algorithms:
-- args:
-    lib_path: ./build/Gallo2011-Soros2013-Yun2017/libBarcodeLocalization.so
-    winsize: 15
-  class: Gallo_detector
-  library: gallo_detector
-  name: Gallo15
-- args:
-    lib_path: ./build/Gallo2011-Soros2013-Yun2017/libBarcodeLocalization.so
-    winsize: 15
-  class: Soros_detector
-  library: soros_detector
-  name: Soros15
-- args:
-    lib_path: ./build/Gallo2011-Soros2013-Yun2017/libBarcodeLocalization.so
-    winsize: 30
-  class: Yun_detector
-  library: yun_detector
-  name: Yun30
-- args:
-    lib_path: ./build/Zamberletti2013/libBarcodeLibrary.so
-    net_path: ./Zamberletti2013/net61x3.net
-  class: Zamberletti_detector
-  library: zamberletti_detector
-  name: Zamberletti
-- args:
-    model_path: ./Saved Models/zharkov_640_0.pt
-  class: Zharkov_detector
-  library: zharkov_detector
-  name: Zharkov
 - args:
     imgsz: 640
     model_path: ./Saved Models/yolon_640_0.pt
@@ -61,3 +32,27 @@ algorithms:
   class: Detectron2_detector
   library: detectron2_detector
   name: RetinaNet
+- args:
+    lib_path: ./build/Gallo2011-Soros2013-Yun2017/libBarcodeLocalization.so
+    winsize: 15
+  class: Gallo_detector
+  library: gallo_detector
+  name: Gallo15
+- args:
+    lib_path: ./build/Gallo2011-Soros2013-Yun2017/libBarcodeLocalization.so
+    winsize: 15
+  class: Soros_detector
+  library: soros_detector
+  name: Soros15
+- args:
+    lib_path: ./build/Gallo2011-Soros2013-Yun2017/libBarcodeLocalization.so
+    winsize: 30
+  class: Yun_detector
+  library: yun_detector
+  name: Yun30
+- args:
+    lib_path: ./build/Zamberletti2013/libBarcodeLibrary.so
+    net_path: ./Zamberletti2013/net61x3.net
+  class: Zamberletti_detector
+  library: zamberletti_detector
+  name: Zamberletti
