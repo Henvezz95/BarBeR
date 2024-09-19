@@ -2,7 +2,7 @@
 The repository contains multiple algorithms for 1D and 2D barcode localization proposed in different papers in the past years. The repository contains the tools to measure the performance of those algorithms
 
 
-<img src='./logo.png' width='200'>
+<img src='./logo_with_name.png'>
 
 # Installation Instructions
 To build the libraries you first need to install:
@@ -126,3 +126,25 @@ Example run 5 multi-class tests:
 ```
 source scripts/k_fold_test_multiclass.sh
 ```
+
+# Testing a New Localization Algorithm
+* The localization method must be defined inside a new python file (e.g. ```new_algorithm.py```) and the file must be placed inside the ```algorithms``` folder
+* Define a class with the implementation of the algorithm. To ensure compatibility, the new class should inherit from the abstract class "BaseDetector" defined in ```algorithms/detectors_abs.py```
+* A detector must have at least these two methods: detect and get_timing
+* **detect works** on a single image and outputs a list of detected bounding boxes, a list with the classes of the detections, and a list of confidence scores (between 0 and 1 if available, otherwise None)
+* **get_timing** returns the processing time of the last detection in milliseconds. The use of ```perf_counter_ns``` is advised, because it has a [high resolution](https://peps.python.org/pep-0564/#annex-clocks-resolution-in-python) (around 100ns) on both Linux and Windows. The output of ```perf_counter_ns``` should then be divided by 1e6.
+  
+ ```python
+# Defining the new class inside algorithms/new_algorithm.py
+from detectors_abs import BaseDetector
+
+class NewDetector(BaseDetector):
+  def __init__():
+    ...
+  def detect(self, img):
+    ...
+  def get_timing(self):
+    ...
+```
+
+* To enable the new algorithm in a test, it should be added to the algorithms list in the configuration file used in the test. Check the available configuration files in the Repository for the exact syntax required
