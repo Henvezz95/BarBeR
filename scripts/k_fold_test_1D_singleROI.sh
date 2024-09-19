@@ -6,6 +6,6 @@ do
     echo "Iteration number ${i+1}"
     python3 python/generate_coco_annotations.py -c ./config/generate_coco_annotations_config.yaml  -k $i
     python3 python/convert_coco_to_yolo.py -c ./annotations/COCO/ -o "./dataset/" 
-    python3 python/create_configuration_yaml.py -s "${IMAGE_SIZE}" -k $i -o "./config/test1D_singleROI.yaml"
+    python3 python/create_configuration_yaml.py -s "${IMAGE_SIZE}" -k $i -o "./config/test1D_singleROI.yaml" -c "1D"
     python3 python/test_single_class.py -c "./config/test1D_singleROI.yaml" -o "./results/reports/test1D_singleROI_${IMAGE_SIZE}_${i}"
 done
