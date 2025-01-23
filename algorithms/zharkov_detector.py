@@ -11,14 +11,14 @@ from models import ZharkovDilatedNet
 from utils.utility import get_contours_and_boxes
 
 class Zharkov_detector(BaseDetector):
-    def __init__(self, model_path, th=0.5, minArea=10, device = 'gpu'):
-        self.model = torch.load(model_path)
+    def __init__(self, model_path, th=0.5, minArea=10, device = 'cpu'):
+        self.model = torch.load(model_path, map_location='cpu')
         # First layer weights are scaled to operate in the range 0..255 instead of 0..1
         # This is done to increase the pre-processing speed
         if device in ['gpu', 'cuda']:
-            self.model.cuda()
+            self.model.to('cuda')
         if device == 'cpu':
-            self.model.cpu()
+            self.model.to('cpu')
         
         self.model.net[0][0].weight.data = self.model.net[0][0].weight.data/255.0 
         self.th = th
