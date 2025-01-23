@@ -30,18 +30,25 @@ def parse_inputs(file_path, argv):
         elif opt in ("-o", "--ofolder"):
             output_path = arg
 
-    if config_path == None:
-        print('A configuration file in yaml format is needed to run the program')
-        print(file_name, '-c <configfile> -o <outputfolder>')
-        sys.exit(2)
-    if output_path == None:
-        print('Provide a path to save the generated Results')
-        print(file_name, '-c <configfile> -o <outputfolder>')
-        sys.exit(2)
-
+    if config_path is None:
+        _extracted_from_parse_inputs_22(
+            'A configuration file in yaml format is needed to run the program',
+            file_name,
+        )
+    if output_path is None:
+        _extracted_from_parse_inputs_22(
+            'Provide a path to save the generated Results', file_name
+        )
     if output_path[-5:] != '.yaml':
         output_path+='.yaml'
     return config_path, output_path
+
+
+# TODO Rename this here and in `parse_inputs`
+def _extracted_from_parse_inputs_22(arg0, file_name):
+    print(arg0)
+    print(file_name, '-c <configfile> -o <outputfolder>')
+    sys.exit(2)
 
 def import_module(name):
     components = name.split('.')
@@ -51,11 +58,9 @@ def import_module(name):
     return mod
 
 
-
 if __name__ == "__main__":
-    
     config_path, output_path = parse_inputs(sys.argv[0], sys.argv[1:])
-    
+
     with open(config_path, "r") as stream:
        test_config = yaml.safe_load(stream)
 
@@ -68,7 +73,7 @@ if __name__ == "__main__":
     NUM_REPEATS = test_config["num_repeats"] if "num_repeats" in test_config else 3
     num_threads = test_config["num_threads"] if "num_threads" in test_config else 1
     step = test_config["step"] if "step" in test_config else 1
-    
+
     if num_threads > 0:
         torch.set_num_threads(num_threads)
         torch.set_num_interop_threads(num_threads)
@@ -77,7 +82,7 @@ if __name__ == "__main__":
 
     with open(f'{coco_annotation_path}datasets_info.json') as json_file:
         datasets_info = json.load(json_file)
-    
+
     detectors = {}
 
     for algorithm in test_config['algorithms']:
@@ -89,7 +94,6 @@ if __name__ == "__main__":
     image_count = 0
     times = {detector_name:[] for detector_name in detectors}
 
-    
     for file in tqdm(list(datasets_info['images'].keys())[::step]):
         file_path = datasets_info['images'][file]['path']
         img = cv2.imread(file_path)
@@ -107,7 +111,7 @@ if __name__ == "__main__":
             img = cv2.resize(img, (W_new, H_new), cv2.INTER_CUBIC)
         else:
             H_new, W_new = H, W
-        
+
         total_area += (W_new*H_new)/1e6   
 
         for detector_name, detector in detectors.items():
@@ -117,9 +121,13 @@ if __name__ == "__main__":
                 current_times.append(detector.get_timing())
             times[detector_name].append(min(current_times))
 
-    results = {}
-    results['num_images'] = image_count
-    results['mean_times'] = {detector_name: float(np.mean(times[detector_name])) for detector_name in times}
+    results = {
+        'num_images': image_count,
+        'mean_times': {
+            detector_name: float(np.mean(times[detector_name]))
+            for detector_name in times
+        },
+    }
     results['total_area'] = total_area
     results['mean_area'] = total_area/image_count
 

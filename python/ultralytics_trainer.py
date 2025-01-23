@@ -1,5 +1,4 @@
 import os
-import os
 import torch
 import shutil
 from ultralytics import YOLO, RTDETR
@@ -41,9 +40,10 @@ def parse_inputs(file_path, argv):
 
 
 
+# sourcery skip: avoid-builtin-shadow
 if __name__ == "__main__":
     config_path, output_path = parse_inputs(sys.argv[0], sys.argv[1:])
-    
+
     # Read YAML file
     with open(config_path, 'r') as stream:
         data_loaded = yaml.safe_load(stream)
@@ -75,7 +75,7 @@ if __name__ == "__main__":
         extension = '.pt'
     elif format == 'torchscript':
         extension = '.torchscript'
-    elif format == 'tflite' or format == 'edgetpu':
+    elif format in ['tflite', 'edgetpu']:
         extension = '.tflite'
     elif format == 'engine':
         extension = '.engine'

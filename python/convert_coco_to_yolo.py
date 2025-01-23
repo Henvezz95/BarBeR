@@ -49,8 +49,10 @@ if __name__ == "__main__":
     annotations = [annotation_folder+file_name for file_name in ['train.json', 'val.json', 'test.json']]
     train_val_test_split = {}
 
-    with open(annotation_folder+'datasets_info.json') as json_file:
+    with open(f'{annotation_folder}datasets_info.json') as json_file:
         datasets_info = json.load(json_file)
+
+    image_counter = 0
 
     for annotation_path in annotations:
         with open(annotation_path) as json_file:
@@ -58,10 +60,8 @@ if __name__ == "__main__":
         annotation_name = os.path.basename(annotation_path)
         train_val_test_split[annotation_name.split('.')[0]] = [datasets_info['images'][x['file_name']]['path']
                                                                 for x in coco_annotations['images']]
-        
+
         ann_index = 0
-        image_counter = 0
-        
         for image_annotation in coco_annotations['images']:
             id = image_annotation['id']
             file_name = image_annotation['file_name']
@@ -74,7 +74,7 @@ if __name__ == "__main__":
                 true_boxes.append(np.array([coco_annotations['annotations'][ann_index]['category_id']-1,
                                             *coco_annotations['annotations'][ann_index]['bbox'], 
                                             ]))
-                
+
                 ann_index+=1
                 if ann_index >= len(coco_annotations['annotations']):
                     break
@@ -83,17 +83,15 @@ if __name__ == "__main__":
                 normalized_box = [box[0], (box[1]+box[3]/2)/W, (box[2]+box[4]/2)/H, box[3]/W, box[4]/H]
                 metadata[file_name].append(normalized_box)
 
-    print(len(metadata)) 
-    if not os.path.isdir(output_path+'labels/'):
-        os.mkdir(output_path+'labels/')
+    print(len(metadata))
+    if not os.path.isdir(f'{output_path}labels/'):
+        os.mkdir(f'{output_path}labels/')
     for file_name in tqdm(metadata):
-        f = open(output_path+'labels/'+file_name[:-3]+'txt', "w")
+        f = open(f'{output_path}labels/{file_name[:-3]}txt', "w")
         f.close()
-        f = open(output_path+'labels/'+file_name[:-3]+'txt', "a")
-        for box in metadata[file_name]:
-            f.write(" ".join([str(x) for x in box])+'\n')
-        f.close()
-
+        with open(f'{output_path}labels/{file_name[:-3]}' + 'txt', "a") as f:
+            for box in metadata[file_name]:
+                f.write(" ".join([str(x) for x in box])+'\n')
     #Generate train.txt, val.txt, test.txt files
     string = ""
 

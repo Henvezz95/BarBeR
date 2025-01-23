@@ -69,6 +69,22 @@ if __name__ == "__main__":
             'class': 'Detectron2_detector',
             'library': 'detectron2_detector',
             'name': 'RetinaNet'
+        },
+        {
+            'args': {
+            'model_path': f'./Saved Models/fscnn_nano_{img_size}_{k_fold}.pt',
+            },
+            'class': 'BaFaLo_detector',
+            'library': 'bafalo_detector',
+            'name': 'FSCNN Nano'
+        },
+        {
+            'args': {
+            'model_path': f'./Saved Models/zharkov_{img_size}_{k_fold}.pt',
+            },
+            'class': 'Zharkov_detector',
+            'library': 'zharkov_detector',
+            'name': 'Zharkov'
         }
         ]
     if barcode_class == '1D':

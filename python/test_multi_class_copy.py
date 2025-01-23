@@ -55,6 +55,7 @@ def import_module(name):
 
 
 if __name__ == "__main__":
+    counter=0
     config_path, output_path = parse_inputs(sys.argv[0], sys.argv[1:])
 
     with open(config_path, "r") as stream:
@@ -66,7 +67,11 @@ if __name__ == "__main__":
         longest_edge_resize = -1
 
     coco_annotation_path = test_config["coco_annotations_path"]
-    bins = test_config['bins'] if 'bins' in test_config else []
+    if 'bins' in test_config:
+        bins = test_config['bins']
+    else:
+        bins = []
+
     with open(f'{coco_annotation_path}test.json') as json_file:
         coco_annotations = json.load(json_file)
 
@@ -158,6 +163,10 @@ if __name__ == "__main__":
 
         for detector_name, detector in detectors.items():
             boxes, classes, confidences = detector.detect(img)
+            for idx,box in enumerate(boxes):
+                x,y,w,h = box
+                cv2.imwrite('./Crops/'+str(counter).zfill(4)+'_'+detector_name+'_'+str(int(confidences[idx]*100))+'.png', img[y:y+h, x:x+w])
+                counter+=1
             detected_bbs[detector_name].extend([
                 BoundingBox(file_name, 
                             0 if classes[i] == '1D' else 1, 
@@ -190,7 +199,7 @@ if __name__ == "__main__":
 
     with open(output_path, 'w') as outfile:
         yaml.dump(results, outfile, default_flow_style=False, sort_keys=False)
-
+        
 
 
     with open(output_path, 'w') as outfile:
