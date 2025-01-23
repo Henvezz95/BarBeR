@@ -11,9 +11,9 @@ class ZharkovLoss(nn.Module):
 
     def forward(self, predictions, ground_truth):
         # Detection Loss
-        BCE = nn.BCEWithLogitsLoss(reduction='none') 
+        BCE = nn.BCEWithLogitsLoss(reduction='none')
         bce_loss = BCE(predictions[:,0,:,:], ground_truth[:,0,:,:])
-        
+
         Lp = (bce_loss * ground_truth[:,0,:,:].float()).sum()
         non_zero_elements = ground_truth[:,0,:,:].sum()+1e-3
         Lp =  (Lp / non_zero_elements)
@@ -31,13 +31,12 @@ class ZharkovLoss(nn.Module):
                 Lh += nn.BCEWithLogitsLoss(reduction='mean')(values, torch.zeros_like(values))
         Lh = Lh / len(ground_truth)
         Lh = 5 * Lh
-        
+
         # Classification Loss
         Lc = nn.functional.cross_entropy(predictions[:,1:,:,:], ground_truth[:,1:,:,:], reduction='none')
         Lc = Lc*ground_truth[:,0,:,:]
         Lc = Lc.sum()/non_zero_elements
-        Loss = Lp+Ln+Lh+Lc
-        return Loss
+        return Lp+Ln+Lh+Lc
 
 class DefaultLoss(nn.Module):
     def __init__(self):
@@ -49,9 +48,8 @@ class DefaultLoss(nn.Module):
     
     def forward(self, predictions, ground_truth):
         # Detection Loss
-        BCE = nn.BCEWithLogitsLoss(reduction='mean') 
+        BCE = nn.BCEWithLogitsLoss(reduction='mean')
         Ld = BCE(predictions[:,0,:,:], ground_truth[:,0,:,:])
         # Classification Loss
         Lc = nn.functional.cross_entropy(predictions[:,1:,:,:], ground_truth[:,1:,:,:], reduction='mean')
-        Loss = Ld+Lc
-        return Loss
+        return Ld+Lc

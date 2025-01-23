@@ -22,8 +22,12 @@ class BaseDilatedNet(nn.Module):
         if layers_params is None:
             layers_params = self._layers_params
 
-        assert all(_out_channels_key in l for l in layers_params), f"'out_channels' must be specified"
-        assert all(_kernel_size_key in l for l in layers_params), f"'kernel_size' must be specified"
+        assert all(
+            _out_channels_key in l for l in layers_params
+        ), "'out_channels' must be specified"
+        assert all(
+            _kernel_size_key in l for l in layers_params
+        ), "'kernel_size' must be specified"
         layers_in_channels = [in_channels] + [l_params.get("out_channels") for l_params in layers_params[:-1]]
         self.net = nn.Sequential(
             *[self._get_layer(in_channels=ch_in, **layer_params)
@@ -38,18 +42,15 @@ class BaseDilatedNet(nn.Module):
     def _get_layer(self, in_channels, out_channels, kernel_size, activation="relu", use_bn=False, **kwargs):
         if activation.lower() != "relu":
             raise NotImplementedError("other activations not supported")
-        if _padding_key not in kwargs:
-            if kernel_size > 1:
-                if kernel_size % 2 == 0:
-                    raise NotImplementedError("implemented correctly only for odd kernel sizes for now")
-                dilation = 1
-                if _dilation_key in kwargs:
-                    dilation = kwargs[_dilation_key]
-                if isinstance(dilation, int):
-                    dilation = (dilation, dilation)
-                mul = (kernel_size - 1) // 2
-                padding = tuple([mul * d for d in dilation])
-                kwargs[_padding_key] = padding
+        if _padding_key not in kwargs and kernel_size > 1:
+            if kernel_size % 2 == 0:
+                raise NotImplementedError("implemented correctly only for odd kernel sizes for now")
+            dilation = kwargs.get(_dilation_key, 1)
+            if isinstance(dilation, int):
+                dilation = (dilation, dilation)
+            mul = (kernel_size - 1) // 2
+            padding = tuple(mul * d for d in dilation)
+            kwargs[_padding_key] = padding
         sublayers = [
             nn.Conv2d(in_channels=in_channels, out_channels=out_channels, kernel_size=kernel_size, **kwargs),
             nn.ReLU(inplace=True)

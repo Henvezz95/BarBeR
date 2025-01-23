@@ -2,8 +2,10 @@ import torch
 from torch.utils.data import DataLoader
 from tqdm import tqdm
 import models
+import sys
+sys.path.append('./python/')
 
-from dataloader import BarcodeDataset
+from utils.dataloader import BarcodeDataset
 from loss_functions import ZharkovLoss, DefaultLoss
 
 import yaml
@@ -17,9 +19,7 @@ def parse_inputs(file_path, argv):
     try:
         opts, _ = getopt.getopt(argv, "hc:o:", ["cfile=", "ofolder="])
     except getopt.GetoptError:
-        print(file_name, '-c <configfile> -o <trained_model_output_path>')
-        print('The configuration file must be in yaml format, the output path does not need an extension, it will be added automatically depending on the format')
-        sys.exit(2)
+        _extracted_from_parse_inputs(file_name)
     for opt, arg in opts:
         if opt == '-h':
             print(file_name, '-c <configfile> -o <trained_model_output_path>')
@@ -30,29 +30,38 @@ def parse_inputs(file_path, argv):
         elif opt in ("-o", "--ofolder"):
             output_path = arg
 
-    if config_path == None:
-        print(file_name, '-c <configfile> -o <trained_model_output_path>')
-        print('The configuration file must be in yaml format, the output path does not need an extension, it will be added automatically depending on the format')
-        sys.exit(2)
-    if output_path == None:
-        print(file_name, '-c <configfile> -o <trained_model_output_path>')
-        print('The configuration file must be in yaml format, the output path does not need an extension, it will be added automatically depending on the format')
-        sys.exit(2)
-
+    if config_path is None:
+        _extracted_from_parse_inputs(file_name)
+    if output_path is None:
+        _extracted_from_parse_inputs(file_name)
     return config_path, output_path
 
 
+# TODO Rename this here and in `parse_inputs`
+def _extracted_from_parse_inputs(file_name):
+    print(file_name, '-c <configfile> -o <trained_model_output_path>')
+    print('The configuration file must be in yaml format, the output path does not need an extension, it will be added automatically depending on the format')
+    sys.exit(2)
+
+
 if __name__ == "__main__":
-    def train_one_epoch():
+    cuda = False
+    def train_one_epoch(cuda=True):
         running_loss = 0.
 
         for i, data in tqdm(enumerate(dataloader_train)):
             inputs, labels = data
 
             optimizer.zero_grad()
-            outputs = model(inputs.cuda())
+            if cuda:
+                outputs = model(inputs.cuda())
+            else:
+                outputs = model(inputs)
 
-            loss = loss_fc(outputs, labels.cuda())
+            if cuda:
+                loss = loss_fc(outputs, labels.cuda())
+            else:
+                loss = loss_fc(outputs, labels)
             loss.backward()
             optimizer.step()
             running_loss += loss.item()
@@ -75,7 +84,10 @@ if __name__ == "__main__":
                                max_size=longest_edge_size, use_ram=use_ram)
     dataloader_val = DataLoader(val_dataset, batch_size=8, shuffle=True, num_workers=0)
 
-    model = models.ZharkovDilatedNet(in_channels=3, num_classes=3).cuda()
+    if cuda:
+        model = models.ZharkovDilatedNet(in_channels=3, num_classes=3).cuda()
+    else:
+        model = models.ZharkovDilatedNet(in_channels=3, num_classes=3)
     if data_loaded['optimizer'] == 'adam':
         optimizer = torch.optim.Adam(model.parameters(), lr=0.001)
     else:
@@ -99,7 +111,7 @@ if __name__ == "__main__":
         print('EPOCH {}:'.format(epoch_number + 1))
 
         model.train(True)
-        avg_loss = train_one_epoch()
+        avg_loss = train_one_epoch(cuda)
 
 
         running_vloss = 0.0
@@ -109,8 +121,12 @@ if __name__ == "__main__":
         with torch.no_grad():
             for i, vdata in tqdm(enumerate(dataloader_val)):
                 vinputs, vlabels = vdata
-                voutputs = model(vinputs.cuda())
-                vloss = loss_fc(voutputs, vlabels.cuda())
+                if cuda:
+                    voutputs = model(vinputs.cuda())
+                    vloss = loss_fc(voutputs, vlabels.cuda())
+                else:
+                    voutputs = model(vinputs)
+                    vloss = loss_fc(voutputs, vlabels)
                 running_vloss += vloss
 
         avg_vloss = running_vloss / (i + 1)
