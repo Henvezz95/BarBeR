@@ -130,9 +130,9 @@ if __name__ == "__main__":
 
     if cuda:
         #model = BaFaLo_1(n_feats = 16, num_blocks = 3, down_ch = 8, num_classes=1).cuda()
-        #model = BiSeNetV2(n_classes=2, in_ch=1, aux=False).cuda()
+        model = BiSeNetV2(n_classes=2, in_ch=1, aux=False).cuda()
         #model = FastSCNN(num_classes=2).cuda()
-        model = FastSCNN_nano(num_classes=2).cuda()
+        #model = FastSCNN_nano(num_classes=2).cuda()
     else:
         model = BaFaLo_1(n_feats = 16, num_blocks = 4, down_ch = 8)
     if data_loaded['optimizer'] == 'adam':

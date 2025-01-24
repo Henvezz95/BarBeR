@@ -303,11 +303,11 @@ class BiSeNetV2(nn.Module):
         feat_head = self.bga(feat_d, feat_s)
 
         logits = self.head(feat_head, size)
-        logits_aux2 = self.aux2(feat2, size)
-        logits_aux3 = self.aux3(feat3, size)
-        logits_aux4 = self.aux4(feat4, size)
-        logits_aux5_4 = self.aux5_4(feat5_4, size)
         if self.aux:
+            logits_aux2 = self.aux2(feat2, size)
+            logits_aux3 = self.aux3(feat3, size)
+            logits_aux4 = self.aux4(feat4, size)
+            logits_aux5_4 = self.aux5_4(feat5_4, size)
             return logits, logits_aux2, logits_aux3, logits_aux4, logits_aux5_4
         else:
             return logits
