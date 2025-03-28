@@ -10,7 +10,7 @@ from utils.boundary_loss_utils import calc_dist_map_chw
 class BarcodeDataset(Dataset):
     def __init__(self, annotation_path, image_path, max_size=640, 
                  num_classes = 2, use_ram = True, downscale_factor=4, 
-                 remove_first_ch = False, gray_scale = True, clahe=False, dist_map=True):
+                 remove_first_ch = False, gray_scale = True, clahe=False, dist_map=False):
         self.root = image_path
         self.coco = COCO(annotation_path)
         self.ids = list(self.coco.imgs.keys())
