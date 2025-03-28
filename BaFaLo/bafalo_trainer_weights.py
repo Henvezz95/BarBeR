@@ -1,23 +1,43 @@
 import torch
+import torchvision
 from torch.utils.data import DataLoader
 from tqdm import tqdm
 from arch import BaFaLo_1
-from fast_scnn import FastSCNN, FastSCNN_0_5x, FastSCNN_0_25x
+from fast_scnn import FastSCNN
 from fast_scnn_nano import FastSCNN_nano
-from fast_scnn_nano_shuffle import FastSCNN_nano_shuffle
-from bisenetv2 import BiSeNetV2, BiSeNetV2_0_5x, BiSeNetV2_0_25x
-from contextnet import ContextNet_0_25x, ContextNet_0_5x, ContextNet
-from training_config_function import get_training_config 
+from bisenetv2 import BiSeNetV2
+from contextnet import ContextNet
 import sys
 sys.path.append('./python')
-from utils.dataloader import BarcodeDataset
-from utils.utility import tensor_resize
-from loss_functions import FocalLoss, WeightedLoss, WeightedDiceLoss, BoundaryLoss
+from utils.dataloader import BarcodeDataset_with_weights
+from loss_functions import DefaultLoss_weighted, WeightedLoss, WeightedDiceLoss, BoundaryLoss
 
 import yaml
 import sys
 import getopt
 import numpy as np
+
+def im2col_sliding_strided(A, window_size, strides=(1,1), reshape=True):
+    m,n = A.shape
+    s0, s1 = A.strides
+    nrows = (m-window_size[0])//strides[0]+1
+    ncols = (n-window_size[1])//strides[1]+1
+    shp = window_size[0],window_size[1],nrows,ncols
+
+    out_view = np.lib.stride_tricks.as_strided(A, shape=shp, strides=(s0,s1,s0*strides[0],s1*strides[1]))
+    if reshape:
+        return np.transpose(out_view, (2,3,0,1)).reshape((-1, window_size[0]*window_size[1]))
+    return out_view
+
+def make_crops_from_image(img, num_H, num_W, offsetX, offsetY):
+    H,W = img.shape
+    x_size = (W-offsetX)//num_W 
+    y_size = (H-offsetY)//num_H 
+    cropped_image = img[offsetY:offsetY+num_H*y_size, offsetX:offsetX+num_W*x_size]
+    img_crops = im2col_sliding_strided(cropped_image, (y_size,x_size), strides=(y_size,x_size), reshape=False)
+    img_crops = img_crops.reshape(y_size,x_size,num_H*num_W)
+    img_crops = np.transpose(img_crops,(2,0,1))
+    return img_crops
 
 def parse_inputs(file_path, argv):
     config_path = None
@@ -54,25 +74,16 @@ def _extracted_from_parse_inputs(file_name):
 if __name__ == "__main__":
     cuda = True
     add_boundary_loss = False
-    def train_one_epoch(cuda=True, crops=False):
+    def train_one_epoch(cuda=True):
         running_loss = 0.
 
         for i, data in tqdm(enumerate(dataloader_train)):
             inputs, labels = data
-            res_alpha = np.random.uniform(min_scale, max_scale)/1.5
-            h_new = w_new = int(np.round(res_alpha*longest_edge_size/32))*32
-            inputs = tensor_resize(inputs, h_new, w_new, mode='bilinear')
-            labels = tensor_resize(labels, h_new, w_new, mode='bilinear')
             optimizer.zero_grad()
 
             if cuda:
                 outputs = model(inputs.cuda())
-                if isinstance(outputs, (tuple, list)):
-                    loss = loss_fc(outputs[0], labels.cuda())
-                    for i in range(1, len(outputs)):
-                        loss += loss_fc(outputs[i], labels.cuda())*aux_weight
-                else:
-                    loss = loss_fc(outputs, labels.cuda())
+                loss = loss_fc(outputs, labels.cuda())
             else:
                 outputs = model(inputs)
                 loss = loss_fc(outputs, labels)
@@ -89,59 +100,52 @@ if __name__ == "__main__":
     use_ram = data_loaded['use_ram']
     annotations_path = data_loaded['coco_annotations_path']
     images_path = data_loaded['images_path']
-    longest_edge_size = int(data_loaded['imgsz']*1.5)
+    longest_edge_size = data_loaded['imgsz']
     batch_size = data_loaded['batch']
     patience = data_loaded['patience']
-    model_type = data_loaded['model_type']
-    num_epochs = data_loaded['epochs']
-    gray_scale = data_loaded['gray_scale']
-    aux = data_loaded['aux']
-    min_scale, max_scale = data_loaded['scale_range']
-    in_ch = 1 if gray_scale else 3
     
-    train_dataset = BarcodeDataset(f'{annotations_path}train.json', 
-                                   images_path, 
-                                   max_size=longest_edge_size, 
-                                   downscale_factor = 1, 
-                                   remove_first_ch = True, 
-                                   gray_scale = gray_scale)
-    dataloader_train = DataLoader(train_dataset, 
-                                  batch_size=batch_size, 
-                                  shuffle=True, 
-                                  num_workers=0)
-    val_dataset = BarcodeDataset(f'{annotations_path}val.json', 
-                                 images_path, 
-                                 max_size=longest_edge_size, 
-                                 downscale_factor=1, 
-                                 remove_first_ch = True, 
-                                 gray_scale = gray_scale)
-    dataloader_val = DataLoader(val_dataset, 
-                                batch_size=batch_size, 
-                                shuffle=True, 
-                                num_workers=0)
+    train_dataset = BarcodeDataset_with_weights(f'{annotations_path}train.json', images_path, clahe=False,
+                               max_size=longest_edge_size, downscale_factor=1, gray_scale = True)
+    dataloader_train = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
+    val_dataset = BarcodeDataset_with_weights(f'{annotations_path}val.json', images_path, clahe=False, 
+                               max_size=longest_edge_size, downscale_factor=1, gray_scale = True)
+    dataloader_val = DataLoader(val_dataset, batch_size=batch_size, shuffle=True, num_workers=0)
 
-    model, loss_fc, optimizer, scheduler, aux_weight = get_training_config(model_type, 
-                                                               num_epochs,  
-                                                               in_ch, 
-                                                               n_classes=2, 
-                                                               aux=False)
     if cuda:
-        model = model.cuda()
+        #model = BaFaLo_1(n_feats = 16, num_blocks = 3, down_ch = 8, num_classes=1).cuda()
+        #model = BiSeNetV2(n_classes=2, in_ch=1, aux=False).cuda()
+        #model = FastSCNN(num_classes=2).cuda()
+        #model = FastSCNN_nano(num_classes=2).cuda()
+        model = ContextNet(num_class=2, n_channel=1).cuda()
+    else:
+        model = BaFaLo_1(n_feats = 16, num_blocks = 4, down_ch = 8)
+    if data_loaded['optimizer'] == 'adam':
+        optimizer = torch.optim.Adam(model.parameters(), lr=0.0005)
+        scheduler = torch.optim.lr_scheduler.ExponentialLR(optimizer, gamma=0.985)
+    else:
+        optimizer = torch.optim.SGD(model.parameters(), lr=0.0005)
         
     epoch_number = 0
+
+    #boundary_loss = BoundaryLoss(scale=1e-3)
+    loss_fc = DefaultLoss_weighted(gamma=2)
+    #loss_fc = WeightedDiceLoss(w1=0.5,w2=0.5)
     vloss_history = []
+
+    EPOCHS = data_loaded['epochs']
     best_vloss = 1e6
 
     if use_ram:
         print('The entire dataset will be loaded into RAM. This should significantly speed up the program after the first epoch')
 
-    for epoch in range(num_epochs):
+    for epoch in range(EPOCHS):
         print('EPOCH {}:'.format(epoch_number + 1))
         print('Learning Rate=', optimizer.param_groups[0]['lr'])
 
         model.train(True)
-        avg_loss = train_one_epoch(cuda, crops=False)
+        avg_loss = train_one_epoch(cuda)
         scheduler.step()
+
 
         running_vloss = 0.0
         model.eval()
@@ -150,18 +154,9 @@ if __name__ == "__main__":
         with torch.no_grad():
             for i, vdata in tqdm(enumerate(dataloader_val)):
                 vinputs, vlabels = vdata
-                res_alpha = np.random.uniform(min_scale, max_scale)/1.5
-                h_new = w_new = int(np.round(res_alpha*longest_edge_size/32))*32
-                vinputs = tensor_resize(vinputs, h_new, w_new)
-                vlabels = tensor_resize(vlabels, h_new, w_new)
                 if cuda:
                     voutputs = model(vinputs.cuda())
-                    if isinstance(voutputs, (tuple, list)):
-                        vloss = loss_fc(voutputs[0], vlabels.cuda())
-                        #for i in range(1, len(voutputs)):
-                        #    vloss += loss_fc(voutputs[i], vlabels.cuda())*0.2
-                    else:
-                        vloss = loss_fc(voutputs, vlabels.cuda())
+                    vloss = loss_fc(voutputs, vlabels.cuda())
                 else:
                     voutputs = model(vinputs)
                     vloss = loss_fc(voutputs, vlabels)

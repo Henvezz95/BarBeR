@@ -1,0 +1,94 @@
+coco_annotations_path: ./annotations/COCO/
+define: &img_size 320
+longest_edge_resize: *img_size
+num_repeats: 3
+num_threads: 12
+step: 16
+define: &device 'cpu'
+define: &onnx true
+num_threads: &num_threads 1
+
+algorithms:
+
+#- args:
+#    imgsz: *img_size
+#    model_path: ./Saved Models/yolon_320_0.onnx
+#    device: *device
+#  class: YOLO_detector
+#  library: ultralytics_detector
+#  name: Yolo Nano
+#- args:
+#    lib_path: ./build/Gallo2011-Soros2013-Yun2017/libBarcodeLocalization.so
+#    winsize: 30
+#  class: Yun_detector
+#  library: yun_detector
+#  name: Yun30
+
+
+- args:
+    model_path: ./Saved Models/fscnn_0.25x_192-448_0.pt
+    minArea: 300
+    th: 0.4
+    activation: sigmoid
+    gray_scale: false
+    remove_first_channel: false
+    device: *device
+    onnx: *onnx
+    num_threads: *num_threads
+  class: Pytorch_segmenter
+  library: pytorch_segmentation
+  name: FSCNN 0.25x
+
+- args:
+    model_path: ./Saved Models/bisenet_0.25x_192-448_0.pt
+    minArea: 300
+    th: 0.4
+    activation: sigmoid
+    gray_scale: false
+    remove_first_channel: false
+    device: *device
+    onnx: *onnx
+    num_threads: *num_threads
+  class: Pytorch_segmenter
+  library: pytorch_segmentation
+  name: Bisenet 0.25x
+
+- args:
+    model_path: ./Saved Models/contextnet_0.25x_192-448_0.pt
+    minArea: 300
+    th: 0.4
+    activation: sigmoid
+    gray_scale: false
+    remove_first_channel: false
+    onnx: *onnx
+    num_threads: *num_threads
+    device: *device
+  class: Pytorch_segmenter
+  library: pytorch_segmentation
+  name: ContextNet 0.25x
+
+- args:
+    model_path: ./Saved Models/bafalo_scnn_192-448_0.pt
+    minArea: 300
+    th: 0.4
+    activation: sigmoid
+    gray_scale: false
+    remove_first_channel: false
+    onnx: *onnx
+    num_threads: *num_threads
+    device: *device
+  class: Pytorch_segmenter
+  library: pytorch_segmentation
+  name: BaFaLo SCNN
+
+- args:
+    model_path: ./Saved Models/zharkov_320_0.pt
+    minArea: 300
+    th: 0.4
+    onnx: *onnx
+    num_threads: *num_threads
+    device: *device
+  class: Zharkov_detector
+  library: zharkov_detector
+  name: Zharkov
+

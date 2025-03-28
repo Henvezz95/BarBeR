@@ -13,22 +13,23 @@ import torch.nn.functional as F
 __all__ = ['FastSCNN', 'get_fast_scnn']
 
 
-class FastSCNN_nano(nn.Module):
+class FastSCNN_nano_shuffle(nn.Module):
     def __init__(self, num_classes, aux=False, **kwargs):
-        super(FastSCNN_nano, self).__init__()
+        super(FastSCNN_nano_shuffle, self).__init__()
         self.aux = aux
         self.learning_to_downsample = LearningToDownsample(16, 24, 32)
         num_ch = 64
         self.global_feature_extractor = GlobalFeatureExtractor(32, [32, num_ch], num_ch, 2, [1, 2])
         self.feature_fusion = FeatureFusionModule(32, num_ch, num_ch)
-        self.classifier = Classifer(num_ch, num_classes)
+        self.classifier = Classifer(num_ch, num_classes*16)
+        self.pixel_shuffle = nn.PixelShuffle(4)
         if self.aux:
             self.auxlayer = nn.Sequential(
                 nn.Conv2d(32, 32, 3, padding=1, bias=False),
                 nn.BatchNorm2d(32),
                 nn.ReLU(True),
                 nn.Dropout(0.1),
-                nn.Conv2d(32, num_classes, 1)
+                nn.Conv2d(32, num_classes*16, 1)
             )
 
     def forward(self, x):
@@ -37,10 +38,12 @@ class FastSCNN_nano(nn.Module):
         x = self.global_feature_extractor(higher_res_features)
         x = self.feature_fusion(higher_res_features, x)
         x = self.classifier(x)
+        x = self.pixel_shuffle(x)
         x = F.interpolate(x, size, mode='bilinear', align_corners=True)
         outputs = x
         if self.aux:
             auxout = self.auxlayer(higher_res_features)
+            auxout = self.pixel_shuffle(auxout)
             auxout = F.interpolate(auxout, size, mode='bilinear', align_corners=True)
             outputs = x, auxout
         return outputs

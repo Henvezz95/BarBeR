@@ -11,7 +11,7 @@ from utils.enumerators import BBType
 from utils.utility import from_np
 import yaml
 
-sys.path.append('./algorithms/') 
+sys.path.append('./algorithms/detectors/') 
 
 def parse_inputs(file_path, argv):
     config_path = None
@@ -127,7 +127,7 @@ if __name__ == "__main__":
 
         while coco_annotations['annotations'][ann_index]['image_id'] == id:
             true_boxes.append(np.array(coco_annotations['annotations'][ann_index]['bbox']))
-            true_boxes[-1][0::2] = np.int32(np.round(W_new*true_boxes[-1][0::2]/W))
+            true_boxes[-1][::2] = np.int32(np.round(W_new * true_boxes[-1][::2] / W))
             true_boxes[-1][1::2] = np.int32(np.round(H_new*true_boxes[-1][1::2]/H))
             area = (true_boxes[-1][-2]* true_boxes[-1][-1])
             true_classes.append(coco_annotations['annotations'][ann_index]['category_id']-1)
@@ -149,7 +149,7 @@ if __name__ == "__main__":
             else:
                 num_labels['large'] += 1
 
-            GT_area += area/1000000 
+            GT_area += area/1000000
             ann_index+=1
             if ann_index >= len(coco_annotations['annotations']):
                 break

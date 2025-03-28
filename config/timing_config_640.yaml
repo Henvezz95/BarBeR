@@ -1,0 +1,127 @@
+coco_annotations_path: ./annotations/COCO/
+define: &img_size 640
+longest_edge_resize: *img_size
+num_repeats: 3
+num_threads: 1
+step: 32
+define: &device 'cpu'
+
+algorithms:
+- args:
+    model_path_coarse: ./Saved_Models/bafalo_320_0.pt
+    model_path_fine: ./Saved_Models/fscnn_nano_crops_640_0.pt
+    tflite: false
+    th1: 0.3
+    minArea1: 400
+    th2: 0.4
+    minArea2: 400
+    device: *device
+    single_class: false
+  class: BaFaLo_2step_detector
+  library: bafalo_detector
+  name: BaFaLo Nano 2step
+- args:
+    model_path_coarse: ./Saved_Models/fscnn_nano_320_0.pt
+    model_path_fine: ./Saved_Models/fscnn_nano_crops_640_0.pt
+    tflite: false
+    th1: 0.3
+    minArea1: 400
+    th2: 0.4
+    minArea2: 400
+    single_class: false
+    device: *device
+  class: BaFaLo_2step_detector
+  library: bafalo_detector
+  name: FSCNN Nano 2step
+
+- args:
+    model_path_coarse: ./Saved_Models/fscnn_nano_singlech_320_0.pt
+    model_path_fine: ./Saved_Models/fscnn_nano_crops_640_0.pt
+    tflite: false
+    th1: 0.3
+    minArea1: 400
+    th2: 0.4
+    minArea2: 400
+    device: *device
+    single_class: true
+  class: BaFaLo_2step_detector
+  library: bafalo_detector
+  name: FSCNN Nano 2step Single Class
+
+- args:
+    model_path: ./Saved_Models/fscnn_nano_640_0.pt
+    clahe: false
+    tflite: false
+    device: *device
+  class: BaFaLo_detector
+  library: bafalo_detector
+  name: FSCNN Nano
+- args:
+    model_path: ./Saved_Models/zharkov_640_0.pt
+    device: *device
+  class: Zharkov_detector
+  library: zharkov_detector
+  name: Zharkov
+#- args:
+#    model_path: ./Saved_Models/bafalo_640_0.pt
+#  class: BaFaLo_detector
+#  library: bafalo_detector
+#  name: Bafalo
+#  device: *device
+#- args:
+#    model_path: ./Saved Models/fasterRCNN_640_0.pt
+#    device: *device
+#  class: Detectron2_detector
+#  library: detectron2_detector
+#  name: FASTER RCNN
+#- args:
+#    imgsz: *img_size
+#    model_path: ./Saved Models/yolon_640_0.pt
+#    device: *device
+#  class: YOLO_detector
+#  library: ultralytics_detector
+#  name: Yolo Nano
+#- args:
+#    imgsz: *img_size
+#    model_path: ./Saved Models/yolom_640_0.pt
+#    device: *device
+#  class: YOLO_detector
+#  library: ultralytics_detector
+#  name: Yolo Medium
+#- args:
+#    imgsz: *img_size
+#    model_path: ./Saved Models/rtdetr_640_0.pt
+#    device: *device
+#  class: RTDETR_detector
+#  library: ultralytics_detector
+#  name: RTDETR Large
+#- args:
+#    model_path: ./Saved Models/retinaNET_640_0.pt
+#    device: *device
+#  class: Detectron2_detector
+#  library: detectron2_detector
+#  name: RetinaNet
+#- args:
+#    lib_path: ./build/Gallo2011-Soros2013-Yun2017/libBarcodeLocalization.so
+#    winsize: 15
+#  class: Gallo_detector
+#  library: gallo_detector
+#  name: Gallo15
+- args:
+    lib_path: ./build/Gallo2011-Soros2013-Yun2017/libBarcodeLocalization.so
+    winsize: 15
+  class: Soros_detector
+  library: soros_detector
+  name: Soros15
+- args:
+    lib_path: ./build/Gallo2011-Soros2013-Yun2017/libBarcodeLocalization.so
+    winsize: 30
+  class: Yun_detector
+  library: yun_detector
+  name: Yun30
+#- args:
+#    lib_path: ./build/Zamberletti2013/libBarcodeLibrary.so
+#    net_path: ./Zamberletti2013/net61x3.net
+#  class: Zamberletti_detector
+#  library: zamberletti_detector
+#  name: Zamberletti

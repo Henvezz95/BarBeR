@@ -1,0 +1,14 @@
+images_path: "./dataset/images/"
+coco_annotations_path: "./annotations/COCO/"
+
+epochs: 250 #Num epochs
+imgsz: 320 #Image size (longest edge in pixels)
+batch : 16   #Batch size
+patience: 100 #Patience used for early stopping
+model_type: 'bisenet_0.125x' # One in [bafalo_scnn, fastscnn, fastscnn_0.5x, fastscnn_0.25x, bisenet, bisenet_0.5x, bisenet_0.25x, contextnet, contextnet_0.5x, contextnet_0.25x]
+use_ram: true #Loads all the dataset in RAM to speed up training (use only if all the Dataset fit in RAM)
+scale_range: [0.6, 1.4]
+gray_scale: false
+aux: true
+
+

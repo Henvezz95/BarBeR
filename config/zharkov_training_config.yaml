@@ -1,8 +1,8 @@
 images_path: "./dataset/images/"
 coco_annotations_path: "./annotations/COCO/"
 
-epochs: 50 #Num epochs
-imgsz: 480 #Image size (longest edge in pixels)
+epochs: 30 #Num epochs
+imgsz: 640 #Image size (longest edge in pixels)
 batch : 8   #Batch size
 patience: 10 #Patience used for early stopping
 use_ram: true #Loads all the dataset in RAM to speed up training (use only if all the Dataset fit in RAM)

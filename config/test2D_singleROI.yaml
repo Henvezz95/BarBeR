@@ -2,7 +2,17 @@ coco_annotations_path: ./annotations/COCO/
 longest_edge_resize: 640
 class: 2D
 single_ROI: true
-bins: [-100, 0, 1,2,3,4,5,6,7,100]
+bins:
+- -100
+- 0
+- 1
+- 2
+- 3
+- 4
+- 5
+- 6
+- 7
+- 100
 algorithms:
 - args:
     imgsz: 640
@@ -10,28 +20,38 @@ algorithms:
   class: YOLO_detector
   library: ultralytics_detector
   name: Yolo Nano
+#- args:
+#    imgsz: 640
+#    model_path: ./Saved Models/yolom_640_0.pt
+#  class: YOLO_detector
+#  library: ultralytics_detector
+#  name: Yolo Medium
+#- args:
+#    imgsz: 640
+#    model_path: ./Saved Models/rtdetr_640_0.pt
+#  class: RTDETR_detector
+#  library: ultralytics_detector
+#  name: RTDETR Large
+#- args:
+#    model_path: ./Saved Models/fasterRCNN_640_0.pt
+#  class: Detectron2_detector
+#  library: detectron2_detector
+#  name: FASTER RCNN
+#- args:
+#    model_path: ./Saved Models/retinaNET_640_0.pt
+#  class: Detectron2_detector
+#  library: detectron2_detector
+#  name: RetinaNet
 - args:
-    imgsz: 640
-    model_path: ./Saved Models/yolom_640_0.pt
-  class: YOLO_detector
-  library: ultralytics_detector
-  name: Yolo Medium
+    model_path: ./Saved Models/fscnn_nano_640_0.pt
+  class: BaFaLo_detector
+  library: bafalo_detector
+  name: FSCNN Nano
 - args:
-    imgsz: 640
-    model_path: ./Saved Models/rtdetr_640_0.pt
-  class: RTDETR_detector
-  library: ultralytics_detector
-  name: RTDETR Large
-- args:
-    model_path: ./Saved Models/fasterRCNN_640_0.pt
-  class: Detectron2_detector
-  library: detectron2_detector
-  name: FASTER RCNN
-- args:
-    model_path: ./Saved Models/retinaNET_640_0.pt
-  class: Detectron2_detector
-  library: detectron2_detector
-  name: RetinaNet
+    model_path: ./Saved Models/zharkov_640_0.pt
+  class: Zharkov_detector
+  library: zharkov_detector
+  name: Zharkov
 - args:
     lib_path: ./build/Gallo2011-Soros2013-Yun2017/libBarcodeLocalization.so
     winsize: 15

@@ -9,17 +9,28 @@ import os
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+import numpy as np
+import math
 
 __all__ = ['FastSCNN', 'get_fast_scnn']
 
 
 class FastSCNN(nn.Module):
-    def __init__(self, num_classes, **kwargs):
+    def __init__(self, num_classes, in_ch=1, aux=False, **kwargs):
         super(FastSCNN, self).__init__()
-        self.learning_to_downsample = LearningToDownsample(32, 48, 64)
+        self.aux = aux
+        self.learning_to_downsample = LearningToDownsample(32, 48, 64, in_ch=in_ch)
         self.global_feature_extractor = GlobalFeatureExtractor(64, [64, 96, 128], 128, 6, [3, 3, 3])
         self.feature_fusion = FeatureFusionModule(64, 128, 128)
         self.classifier = Classifer(128, num_classes)
+        if self.aux:
+            self.auxlayer = nn.Sequential(
+                nn.Conv2d(32, 32, 3, padding=1, bias=False),
+                nn.BatchNorm2d(32),
+                nn.ReLU(True),
+                nn.Dropout(0.1),
+                nn.Conv2d(32, num_classes, 1)
+            )
 
     def forward(self, x):
         size = x.size()[2:]
@@ -28,7 +39,74 @@ class FastSCNN(nn.Module):
         x = self.feature_fusion(higher_res_features, x)
         x = self.classifier(x)
         x = F.interpolate(x, size, mode='bilinear', align_corners=True)
-        return x
+        outputs = x
+        if self.aux:
+            auxout = self.auxlayer(higher_res_features)
+            auxout = F.interpolate(auxout, size, mode='bilinear', align_corners=True)
+            outputs = x, auxout
+        return outputs
+    
+class FastSCNN_0_5x(nn.Module):
+    def __init__(self, num_classes, in_ch=1, aux=False, **kwargs):
+        super(FastSCNN_0_5x, self).__init__()
+        self.aux = aux
+        self.learning_to_downsample = LearningToDownsample(16, 24, 32, in_ch=in_ch)
+        self.global_feature_extractor = GlobalFeatureExtractor(32, [32, 48, 64], 64, 6, [3, 3, 3])
+        self.feature_fusion = FeatureFusionModule(32, 64, 64)
+        self.classifier = Classifer(64, num_classes)
+        if self.aux:
+            self.auxlayer = nn.Sequential(
+                nn.Conv2d(16, 16, 3, padding=1, bias=False),
+                nn.BatchNorm2d(16),
+                nn.ReLU(True),
+                nn.Dropout(0.1),
+                nn.Conv2d(16, num_classes, 1)
+            )
+
+    def forward(self, x):
+        size = x.size()[2:]
+        higher_res_features = self.learning_to_downsample(x)
+        x = self.global_feature_extractor(higher_res_features)
+        x = self.feature_fusion(higher_res_features, x)
+        x = self.classifier(x)
+        x = F.interpolate(x, size, mode='bilinear', align_corners=True)
+        outputs = x
+        if self.aux:
+            auxout = self.auxlayer(higher_res_features)
+            auxout = F.interpolate(auxout, size, mode='bilinear', align_corners=True)
+            outputs = x, auxout
+        return outputs
+    
+class FastSCNN_0_25x(nn.Module):
+    def __init__(self, num_classes, in_ch=1, aux=False, **kwargs):
+        super(FastSCNN_0_25x, self).__init__()
+        self.aux = aux
+        self.learning_to_downsample = LearningToDownsample(8, 12, 16, in_ch=in_ch)
+        self.global_feature_extractor = GlobalFeatureExtractor(16, [16, 24, 32], 32, 6, [3, 3, 3])
+        self.feature_fusion = FeatureFusionModule(16, 32, 32)
+        self.classifier = Classifer(32, num_classes)
+        if self.aux:
+            self.auxlayer = nn.Sequential(
+                nn.Conv2d(8, 8, 3, padding=1, bias=False),
+                nn.BatchNorm2d(8),
+                nn.ReLU(True),
+                nn.Dropout(0.1),
+                nn.Conv2d(8, num_classes, 1)
+            )
+
+    def forward(self, x):
+        size = x.size()[2:]
+        higher_res_features = self.learning_to_downsample(x)
+        x = self.global_feature_extractor(higher_res_features)
+        x = self.feature_fusion(higher_res_features, x)
+        x = self.classifier(x)
+        x = F.interpolate(x, size, mode='bilinear', align_corners=True)
+        outputs = x
+        if self.aux:
+            auxout = self.auxlayer(higher_res_features)
+            auxout = F.interpolate(auxout, size, mode='bilinear', align_corners=True)
+            outputs = x, auxout
+        return outputs
 
 class _ConvBNReLU(nn.Module):
     """Conv-BN-ReLU"""
@@ -98,7 +176,39 @@ class LinearBottleneck(nn.Module):
             out = x + out
         return out
 
+class MyAdaptiveAvgPool2d(nn.Module):
+    def __init__(self, output_size):
+        """
+        Mimics nn.AdaptiveAvgPool2d by computing, for each output cell,
+        the pooling window as:
+            start = floor(i * input_size / output_size)
+            end   = ceil((i+1) * input_size / output_size)
+        and then averaging over that region.
+        """
+        super(MyAdaptiveAvgPool2d, self).__init__()
+        if isinstance(output_size, int):
+            output_size = (output_size, output_size)
+        self.out_size = output_size
 
+    def forward(self, x):
+        N, C, H, W = x.shape
+        out_h, out_w = self.out_size
+        # Prepare output tensor.
+        out = x.new_empty((N, C, out_h, out_w))
+        # Loop over each output index.
+        for i in range(out_h):
+            # Compute vertical boundaries for output row i.
+            start_h = math.floor(i * H / out_h)
+            end_h = math.ceil((i + 1) * H / out_h)
+            for j in range(out_w):
+                # Compute horizontal boundaries for output column j.
+                start_w = math.floor(j * W / out_w)
+                end_w = math.ceil((j + 1) * W / out_w)
+                # Slice the input region and compute its mean.
+                region = x[:, :, start_h:end_h, start_w:end_w]
+                out[:, :, i, j] = region.mean(dim=(-1, -2))
+        return out
+     
 class PyramidPooling(nn.Module):
     """Pyramid pooling module"""
 
@@ -112,7 +222,8 @@ class PyramidPooling(nn.Module):
         self.out = _ConvBNReLU(in_channels * 2, out_channels, 1)
 
     def pool(self, x, size):
-        avgpool = nn.AdaptiveAvgPool2d(size)
+        #avgpool = nn.AdaptiveAvgPool2d(size)
+        avgpool = MyAdaptiveAvgPool2d(size)
         return avgpool(x)
 
     def upsample(self, x, size):
@@ -132,9 +243,9 @@ class PyramidPooling(nn.Module):
 class LearningToDownsample(nn.Module):
     """Learning to downsample module"""
 
-    def __init__(self, dw_channels1=32, dw_channels2=48, out_channels=64, **kwargs):
+    def __init__(self, dw_channels1=32, dw_channels2=48, out_channels=64, in_ch=1):
         super(LearningToDownsample, self).__init__()
-        self.conv = _ConvBNReLU(1, dw_channels1, 3, 2)
+        self.conv = _ConvBNReLU(in_ch, dw_channels1, 3, 2)
         self.dsconv1 = _DSConv(dw_channels1, dw_channels2, 2)
         self.dsconv2 = _DSConv(dw_channels2, out_channels, 2)
 
@@ -215,3 +326,44 @@ class Classifer(nn.Module):
         x = self.dsconv2(x)
         x = self.conv(x)
         return x
+    
+
+    
+def test_adaptive_pool_equivalence():
+    torch.manual_seed(0)
+    input_tensor = torch.randn(1, 3, 32, 32)  # example input
+    out_size = (6, 6)
+
+    # Built-in adaptive avg pooling
+    builtin_pool = nn.AdaptiveAvgPool2d(out_size)
+    output_builtin = builtin_pool(input_tensor)
+
+    # Custom pooling
+    custom_pool = MyAdaptiveAvgPool2d(out_size)
+    output_custom = custom_pool(input_tensor)
+
+    print("Output from nn.AdaptiveAvgPool2d:")
+    print(output_builtin)
+    print("\nOutput from MyAdaptiveAvgPool2d:")
+    print(output_custom)
+    print("\nAre the outputs close? ", torch.allclose(output_builtin, output_custom, atol=1e-5))
+
+# A simple model that uses our custom pooling so we can export it to ONNX.
+class ModelWithCustomPool(nn.Module):
+    def __init__(self, output_size):
+        super(ModelWithCustomPool, self).__init__()
+        self.pool = MyAdaptiveAvgPool2d(output_size)
+    def forward(self, x):
+        return self.pool(x)
+
+def export_to_onnx():
+    # Use an input size that is not necessarily a multiple of the output size.
+    input_tensor = torch.randn(1, 3, 1, 4)
+    model = ModelWithCustomPool((5, 6))
+    # Export with a supported opset version (e.g., 17)
+    torch.onnx.export(model, input_tensor, "my_adaptive_avg_pool.onnx", opset_version=17)
+    print("\nExported ModelWithCustomPool to ONNX successfully.")
+
+if __name__ == '__main__':
+    test_adaptive_pool_equivalence()
+    export_to_onnx()

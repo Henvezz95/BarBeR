@@ -8,7 +8,7 @@ import os
 import torch
 import yaml
 
-sys.path.append('./algorithms/') 
+sys.path.append('./algorithms/detectors/') 
 
 def parse_inputs(file_path, argv):
     config_path = None

@@ -1,0 +1,134 @@
+coco_annotations_path: ./annotations/COCO/
+longest_edge_resize: 320
+class: multi
+single_ROI: true
+algorithms:
+- args:
+    imgsz: 320
+    model_path: ./Saved Models/yolon_320_0.pt
+  class: YOLO_detector
+  library: ultralytics_detector
+  name: Yolo Nano
+#- args:
+#    imgsz: 640
+#    model_path: ./Saved Models/yolom_640_0.pt
+#  class: YOLO_detector
+#  library: ultralytics_detector
+#  name: Yolo Medium
+#- args:
+#    imgsz: 640
+#    model_path: ./Saved Models/rtdetr_640_0.pt
+#  class: RTDETR_detector
+#  library: ultralytics_detector
+#  name: RTDETR Large
+#- args:
+#    model_path: ./Saved Models/fasterRCNN_640_0.pt
+#  class: Detectron2_detector
+#  library: detectron2_detector
+#  name: FASTER RCNN
+#- args:
+#    model_path: ./Saved Models/retinaNET_640_0.pt
+#  class: Detectron2_detector
+#  library: detectron2_detector
+#  name: RetinaNet
+
+#- args:
+#    model_path: ./Saved Models/fasterSeg_xs_teacher_320_0.pt
+#    minArea: 200
+#    activation: softmax
+#    gray_scale: false
+#    remove_first_channel: true
+#  class: Pytorch_segmenter
+#  library: pytorch_segmentation
+#  name: FasterSeg XS Teacher
+
+#- args:
+#    model_path: ./Saved Models/fasterSeg_xs_student_320_0.pt
+#    minArea: 200
+#    activation: softmax
+#    gray_scale: false
+#    remove_first_channel: true
+#  class: Pytorch_segmenter
+#  library: pytorch_segmentation
+#  name: FasterSeg XS Student
+
+- args:
+    model_path: ./Saved Models/fscnn_0.25x_192-448_0.pt
+    minArea: 300
+    th: 0.4
+    activation: sigmoid
+    gray_scale: false
+    remove_first_channel: false
+  class: Pytorch_segmenter
+  library: pytorch_segmentation
+  name: FSCNN 0.25
+
+- args:
+    model_path: ./Saved Models/fscnn_0.5x_192-448_0.pt
+    minArea: 300
+    th: 0.4
+    activation: sigmoid
+    gray_scale: false
+    remove_first_channel: false
+  class: Pytorch_segmenter
+  library: pytorch_segmentation
+  name: FSCNN 0.5
+
+- args:
+    model_path: ./Saved Models/contextnet_0.25x_192-448_0.pt
+    minArea: 300
+    th: 0.4
+    activation: sigmoid
+    gray_scale: false
+    remove_first_channel: false
+  class: Pytorch_segmenter
+  library: pytorch_segmentation
+  name: Contextnet 0.25
+
+- args:
+    model_path: ./Saved Models/bisenet_0.25x_192-448_0.pt
+    minArea: 300
+    th: 0.4
+    activation: sigmoid
+    gray_scale: false
+    remove_first_channel: false
+  class: Pytorch_segmenter
+  library: pytorch_segmentation
+  name: BiseNet 0.25
+
+
+- args:
+    model_path: ./Saved Models/bafalo_scnn_192-448_0.pt
+    minArea: 300
+    th: 0.4
+    activation: sigmoid
+    gray_scale: false
+    remove_first_channel: false
+  class: Pytorch_segmenter
+  library: pytorch_segmentation
+  name: BaFaLo 0.25
+
+- args:
+    model_path: ./Saved Models/bafalo_scnn_noshuffle_192-448_0.pt
+    minArea: 300
+    th: 0.4
+    activation: sigmoid
+    gray_scale: false
+    remove_first_channel: false
+  class: Pytorch_segmenter
+  library: pytorch_segmentation
+  name: BaFaLo 0.25 NoShuffle
+  
+
+- args:
+    model_path: ./Saved Models/zharkov_320_0.pt
+    minArea: 300
+    th: 0.4
+    onnx: false
+
+  class: Zharkov_detector
+  library: zharkov_detector
+  name: Zharkov
+
+  
+ 

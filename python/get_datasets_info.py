@@ -28,6 +28,7 @@ ppes = {'1D':[], '2D':[]}
 areas = {'1D':[], '2D':[]}
 plot_points1D = {'ppe':[], 'area':[]}
 plot_points2D = {'ppe':[], 'area':[]}
+all_types = []
 for dataset_name in dataset_dictionary:
     num_1D = 0
     num_2D = 0
@@ -57,7 +58,7 @@ for dataset_name in dataset_dictionary:
                 H_new, W_new = H, W
             ratio = H_new/H
 
-                
+            all_types.append(region['region_attributes']['Type'])
             if region['region_attributes']['Type'] in ['QR', 'DATAMATRIX', 'AZTEC', 'PDF417', '2D']:
                 ppe = float(region['region_attributes']['PPE'])*ratio
                 ppes['2D'].append(ppe)
@@ -88,6 +89,7 @@ for dataset_name in dataset_dictionary:
     print(dataset_name, '&', len(metadata['_via_img_metadata']), '&', str(W_min)+'\\times'+str(H_min), '&',  str(W_max)+'\\times'+str(H_max), '&', num_1D, '&', num_2D)
 
 print('\n')
+print(set(all_types))
 min_size = sorted(all_sizes, key=lambda x: x[0])[0]
 max_size = sorted(all_sizes, key=lambda x: x[0])[-1]
 img_min = cv2.imread("./dataset/images/"+min_size[1])

@@ -1,34 +1,30 @@
-###########################################################################
-# Created by: Tramac
-# Date: 2019-03-25
-# Copyright (c) 2017
-###########################################################################
-
 """Fast Segmentation Convolutional Neural Network"""
 import os
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+from ecb import ECB
+import torch
+import onnx
 
-__all__ = ['FastSCNN', 'get_fast_scnn']
 
-
-class FastSCNN_nano(nn.Module):
+class FastSCNN_pico_ecb(nn.Module):
     def __init__(self, num_classes, aux=False, **kwargs):
-        super(FastSCNN_nano, self).__init__()
+        super(FastSCNN_pico_ecb, self).__init__()
         self.aux = aux
-        self.learning_to_downsample = LearningToDownsample(16, 24, 32)
-        num_ch = 64
-        self.global_feature_extractor = GlobalFeatureExtractor(32, [32, num_ch], num_ch, 2, [1, 2])
+        self.learning_to_downsample = LearningToDownsample_ECB(8, 16, 32)
+        num_ch = 32
+        self.global_feature_extractor = GlobalFeatureExtractor(32, [32, num_ch], 2, [1, 2])
         self.feature_fusion = FeatureFusionModule(32, num_ch, num_ch)
-        self.classifier = Classifer(num_ch, num_classes)
+        self.classifier = Classifer(num_ch, num_classes*16)
+        self.pixel_shuffle = nn.PixelShuffle(4)
         if self.aux:
             self.auxlayer = nn.Sequential(
                 nn.Conv2d(32, 32, 3, padding=1, bias=False),
                 nn.BatchNorm2d(32),
                 nn.ReLU(True),
                 nn.Dropout(0.1),
-                nn.Conv2d(32, num_classes, 1)
+                nn.Conv2d(32, num_classes*16, 1)
             )
 
     def forward(self, x):
@@ -37,13 +33,22 @@ class FastSCNN_nano(nn.Module):
         x = self.global_feature_extractor(higher_res_features)
         x = self.feature_fusion(higher_res_features, x)
         x = self.classifier(x)
+        x = self.pixel_shuffle(x)
         x = F.interpolate(x, size, mode='bilinear', align_corners=True)
         outputs = x
         if self.aux:
             auxout = self.auxlayer(higher_res_features)
+            auxout = self.pixel_shuffle(auxout)
             auxout = F.interpolate(auxout, size, mode='bilinear', align_corners=True)
             outputs = x, auxout
         return outputs
+    
+    def eval(self):
+        for module in self.modules():
+            if isinstance(module, ECB):
+                module.rep_params()  # Explicitly merge weights
+        super().eval()
+
 
 class _ConvBNReLU(nn.Module):
     """Conv-BN-ReLU"""
@@ -58,6 +63,21 @@ class _ConvBNReLU(nn.Module):
 
     def forward(self, x):
         return self.conv(x)
+    
+    
+class _ConvReLU_ECB(nn.Module):
+    """Conv-BN-ReLU"""
+    def __init__(self, in_channels, out_channels, stride=1, padding=0, **kwargs):
+        super(_ConvReLU_ECB, self).__init__()
+        self.conv = nn.Sequential(
+            ECB(in_channels, out_channels, 2, stride, act_type='linear'),
+            #nn.BatchNorm2d(out_channels),
+            nn.ReLU(True)
+        )
+
+    def forward(self, x):
+        return self.conv(x)
+    
 
 
 class _DSConv(nn.Module):
@@ -114,86 +134,54 @@ class LinearBottleneck(nn.Module):
         return out
 
 
-class PyramidPooling(nn.Module):
-    """Pyramid pooling module"""
-
-    def __init__(self, in_channels, out_channels, **kwargs):
-        super(PyramidPooling, self).__init__()
-        inter_channels = int(in_channels / 4)
-        self.conv1 = _ConvBNReLU(in_channels, inter_channels, 1, **kwargs)
-        self.conv2 = _ConvBNReLU(in_channels, inter_channels, 1, **kwargs)
-        self.conv3 = _ConvBNReLU(in_channels, inter_channels, 1, **kwargs)
-        self.conv4 = _ConvBNReLU(in_channels, inter_channels, 1, **kwargs)
-        self.out = _ConvBNReLU(in_channels * 2, out_channels, 1)
-
-    def pool(self, x, size):
-        avgpool = nn.AdaptiveAvgPool2d(size)
-        return avgpool(x)
-
-    def upsample(self, x, size):
-        return F.interpolate(x, size, mode='bilinear', align_corners=True)
-
-    def forward(self, x):
-        size = x.size()[2:]
-        feat1 = self.upsample(self.conv1(self.pool(x, 1)), size)
-        feat2 = self.upsample(self.conv2(self.pool(x, 2)), size)
-        feat3 = self.upsample(self.conv3(self.pool(x, 3)), size)
-        feat4 = self.upsample(self.conv4(self.pool(x, 6)), size)
-        x = torch.cat([x, feat1, feat2, feat3, feat4], dim=1)
-        x = self.out(x)
-        return x
-
-
-class LearningToDownsample(nn.Module):
+class LearningToDownsample_ECB(nn.Module):
     """Learning to downsample module"""
 
-    def __init__(self, dw_channels1=32, dw_channels2=48, out_channels=64, **kwargs):
-        super(LearningToDownsample, self).__init__()
-        self.conv = _ConvBNReLU(1, dw_channels1, 3, 2)
-        self.dsconv1 = _DSConv(dw_channels1, dw_channels2, 2)
-        self.dsconv2 = _DSConv(dw_channels2, out_channels, 2)
+    def __init__(self, dw_channels1=8, dw_channels2=16, out_channels=32, **kwargs):
+        super(LearningToDownsample_ECB, self).__init__()
+        self.conv1 = _ConvReLU_ECB(1, dw_channels1, 2, 1)
+        self.conv2 = _ConvReLU_ECB(dw_channels1, dw_channels2, 2, 1)
+        self.conv3 = _ConvReLU_ECB(dw_channels2, out_channels, 2, 1)
 
     def forward(self, x):
-        x = self.conv(x)
-        x = self.dsconv1(x)
-        x = self.dsconv2(x)
+        x = self.conv1(x)
+        x = self.conv2(x)
+        x = self.conv3(x)
         return x
-
+    
+    def eval(self):
+        for module in self.modules():
+            if isinstance(module, ECB):
+                module.rep_params()  # Explicitly merge weights
+        super().eval()
 
 class GlobalFeatureExtractor(nn.Module):
     """Global feature extractor module"""
 
     def __init__(self, in_channels=64, block_channels=(64, 96, 128),
-                 out_channels=128, t=6, num_blocks=(3, 3, 3), **kwargs):
+                  t=6, num_blocks=(3, 3)):
         super(GlobalFeatureExtractor, self).__init__()
         self.bottleneck1 = self._make_layer(LinearBottleneck, in_channels, block_channels[0], num_blocks[0], t, 2)
         self.bottleneck2 = self._make_layer(LinearBottleneck, block_channels[0], block_channels[1], num_blocks[1], t, 2)
-        #self.bottleneck3 = self._make_layer(LinearBottleneck, block_channels[1], block_channels[2], num_blocks[2], t, 1)
-        #self.ppm = PyramidPooling(block_channels[2], out_channels)
-        #self.ppm = PyramidPooling(block_channels[1], out_channels)
 
     def _make_layer(self, block, inplanes, planes, blocks, t=6, stride=1):
-        layers = []
-        layers.append(block(inplanes, planes, t, stride))
-        for i in range(1, blocks):
-            layers.append(block(planes, planes, t, 1))
+        layers = [block(inplanes, planes, t, stride)]
+        layers.extend(block(planes, planes, t, 1) for _ in range(1, blocks))
         return nn.Sequential(*layers)
 
     def forward(self, x):
         x = self.bottleneck1(x)
         x = self.bottleneck2(x)
-        #x = self.bottleneck3(x)
-        #x = self.ppm(x)
         return x
 
 
 class FeatureFusionModule(nn.Module):
     """Feature fusion module"""
 
-    def __init__(self, highter_in_channels, lower_in_channels, out_channels, scale_factor=4, **kwargs):
+    def __init__(self, highter_in_channels, lower_in_channels, out_channels, scale_factor=4):
         super(FeatureFusionModule, self).__init__()
         self.scale_factor = scale_factor
-        self.dwconv = _DWConv(lower_in_channels, out_channels, 1)
+        self.dwconv = nn.Conv2d(lower_in_channels, out_channels, 3, padding=1)
         self.conv_lower_res = nn.Sequential(
             nn.Conv2d(out_channels, out_channels, 1),
             nn.BatchNorm2d(out_channels)
@@ -205,7 +193,10 @@ class FeatureFusionModule(nn.Module):
         self.relu = nn.ReLU(True)
 
     def forward(self, higher_res_feature, lower_res_feature):
-        lower_res_feature = F.interpolate(lower_res_feature, scale_factor=4, mode='bilinear', align_corners=True)
+        lower_res_feature = F.interpolate(lower_res_feature, 
+                                          scale_factor=4, 
+                                          mode='bilinear', 
+                                          align_corners=True)
         lower_res_feature = self.dwconv(lower_res_feature)
         lower_res_feature = self.conv_lower_res(lower_res_feature)
 
@@ -231,3 +222,23 @@ class Classifer(nn.Module):
         x = self.dsconv2(x)
         x = self.conv(x)
         return x
+
+if __name__ == '__main__':
+    model = FastSCNN_pico_ecb(2, False)
+    x = torch.randn(1, 1, 320, 320)
+    train_res = model(x)
+
+    # Switch to inference mode
+    model.eval()
+    eval_res = model(x)
+
+    # Print ECB after calling eval()
+    print("Diff:", torch.abs(train_res-eval_res).mean())  # ECB should
+
+    # Export to ONNX
+    torch.onnx.export(model, x, "convbnrelu_ecb.onnx", opset_version=19, verbose=True)
+    onnx_model = onnx.load("convbnrelu_ecb.onnx")
+
+    # Print ONNX nodes
+    for node in onnx_model.graph.node:
+        print(node.op_type, node.name)

@@ -11,7 +11,7 @@ from evaluators import coco_evaluator
 from utils.enumerators import BBType
 import yaml
 
-sys.path.append('./algorithms/') 
+sys.path.append('./algorithms/detectors/') 
 
 def parse_inputs(file_path, argv):
     config_path = None
@@ -57,7 +57,7 @@ def import_module(name):
 
 if __name__ == "__main__":
     config_path, output_path = parse_inputs(sys.argv[0], sys.argv[1:])
-    
+
     with open(config_path, "r") as stream:
        test_config = yaml.safe_load(stream)
 
@@ -69,17 +69,13 @@ if __name__ == "__main__":
     coco_annotation_path = test_config["coco_annotations_path"]
     single_code = test_config["single_ROI"]
     class_id = 1 if test_config["class"] == '1D' else 2
-    if 'bins' in test_config:
-        bins = test_config['bins']
-    else:
-        bins = []
-
+    bins = test_config['bins'] if 'bins' in test_config else []
     with open(f'{coco_annotation_path}test.json') as json_file:
         coco_annotations = json.load(json_file)
 
     with open(f'{coco_annotation_path}datasets_info.json') as json_file:
         datasets_info = json.load(json_file)
-    
+
     detectors = {}
 
     for algorithm in test_config['algorithms']:
@@ -96,8 +92,14 @@ if __name__ == "__main__":
     num_labels = {'small':0, 'medium':0, 'large':0}
     all_ppe_values = []
     all_areas = []
-    datasets_map = {dataset:set(k for k in datasets_info['images'] if datasets_info['images'][k]['dataset']==dataset)
-                           for dataset in datasets_info['datasets']}
+    datasets_map = {
+        dataset: {
+            k
+            for k in datasets_info['images']
+            if datasets_info['images'][k]['dataset'] == dataset
+        }
+        for dataset in datasets_info['datasets']
+    }
 
     for image_annotation in tqdm(coco_annotations['images']):
         id = image_annotation['id']
@@ -119,9 +121,9 @@ if __name__ == "__main__":
             ann_index+=1
             if ann_index >= len(coco_annotations['annotations']):
                 break
-            
+
         if remove_this_image:
-            continue  
+            continue
         if single_code and len(true_boxes) != 1:
             continue    
 
@@ -140,11 +142,11 @@ if __name__ == "__main__":
             img = cv2.resize(img, (W_new, H_new), cv2.INTER_CUBIC)
         else:
             H_new, W_new = H, W
-         
-        total_area += (W_new*H_new)/10e6        
-           
+
+        total_area += (W_new*H_new)/1e6        
+
         for i in range(len(true_boxes)):
-            true_boxes[i][0::2] = np.int32(np.round(W_new*true_boxes[-1][0::2]/W))
+            true_boxes[i][::2] = np.int32(np.round(W_new*true_boxes[-1][::2]/W))
             true_boxes[i][1::2] = np.int32(np.round(H_new*true_boxes[-1][1::2]/H))
             true_polygons[-1][:,0] = np.int32(np.round(W_new*true_polygons[-1][:,0]/W))
             true_polygons[-1][:,1] = np.int32(np.round(H_new*true_polygons[-1][:,1]/H))
@@ -152,7 +154,7 @@ if __name__ == "__main__":
             true_ppe[i] = true_ppe[i]/W*W_new
             all_areas.append(area)
             all_ppe_values.append(true_ppe[i])
-            GT_area += area/10e6
+            GT_area += area/1e6
 
             if area < 32**2:
                 num_labels['small'] += 1
@@ -160,9 +162,9 @@ if __name__ == "__main__":
                 num_labels['medium'] += 1
             else:
                 num_labels['large'] += 1
-        
+
         dataset_name = datasets_info['images'][file_name]['dataset']
-        
+
         for detector_name, detector in detectors.items():
             boxes, classes, confidences = detector.detect(img)
             detected_bbs[detector_name].extend([
@@ -189,14 +191,18 @@ if __name__ == "__main__":
                "GT_area": float(GT_area), 
                "evaluation":{},
                "ppe_evaluation": {}}
-    
+
     for detector_name in detectors:
         COCOevaluation = coco_evaluator.get_coco_summary2(groundtruth_bbs[detector_name], detected_bbs[detector_name])
         results['evaluation'][detector_name] = {key:{k:from_np(v) for k,v in COCOevaluation[key].items()} for key in COCOevaluation}
         ppe_evaluation = {}
         if single_code:
             for k in range(len(bins)-1):
-                file_names = set(bbs._image_name for bbs in groundtruth_bbs[detector_name] if bins[k] <= bbs._ppe < bins[k+1])
+                file_names = {
+                    bbs._image_name
+                    for bbs in groundtruth_bbs[detector_name]
+                    if bins[k] <= bbs._ppe < bins[k + 1]
+                }
                 filtered_gt = [bbs for bbs in groundtruth_bbs[detector_name] if bbs._image_name in file_names]
                 filtered_dt = [bbs for bbs in detected_bbs[detector_name] if bbs._image_name in file_names]
                 if len(filtered_gt) > 0:
@@ -205,6 +211,6 @@ if __name__ == "__main__":
         else:
             ppe_evaluation = coco_evaluator.get_pixel_density_summary(groundtruth_bbs[detector_name], detected_bbs[detector_name], bins)
         results["ppe_evaluation"][detector_name] = ppe_evaluation
-    
+
     with open(output_path, 'w') as outfile:
         yaml.dump(results, outfile, default_flow_style=False, sort_keys=False)

@@ -8,7 +8,7 @@ from tqdm import tqdm
 from glob import glob
 import numpy as np
 import yaml
-import getopt
+import argparse
 import sys
 
 def create_image_info(image_id, file_name, image_size,
@@ -72,7 +72,9 @@ def convert_all(img_files, annpaths, datasets_dictionary):
             "version": "0.1.0",
             "year": datetime.date.today().strftime("%Y"),
             "contributor": "Enrico Vezzali",
-            "date_created": datetime.datetime.utcnow().isoformat(' '),
+            "date_created": datetime.datetime.now(
+                datetime.timezone.utc
+            ).isoformat(' '),
         },
     }
 
@@ -123,8 +125,11 @@ def convert_all(img_files, annpaths, datasets_dictionary):
                 # make annotations info and storage it in coco_output['annotations']
                 ann_info = create_annotation_info(ann_id, img_id, cat_id, iscrowd, area, box, segmentation)
                 datasets_dictionary['images'][filename]['ids'].append(int(ann_id))
+                datasets_dictionary['images'][filename]['polygons'][int(ann_id)] = ann_info['segmentation']
+                datasets_dictionary['images'][filename]['boxes'][int(ann_id)] = ann_info['bbox']
                 datasets_dictionary['images'][filename]['types'][int(ann_id)] = cat
                 datasets_dictionary['images'][filename]['ppes'][int(ann_id)] = float(region['region_attributes']['PPE'])
+                datasets_dictionary['images'][filename]['strings'][int(ann_id)] = region['region_attributes']['String']
                 coco_output['annotations'].append(ann_info)
                 ann_id = ann_id + 1
             datasets_dictionary['images'][filename]['shape'] = H,W
@@ -133,37 +138,24 @@ def convert_all(img_files, annpaths, datasets_dictionary):
     return coco_output
 
 def parse_inputs(file_path, argv):
-    config_path = None
-    k_index = None
-    file_name = file_path.split('/')[-1]
-    try:
-        opts, _ = getopt.getopt(argv, "hc:k:", ["cfile=", "kindex="])
-    except getopt.GetoptError:
-        print(file_name, '-c <configfile> -k <k_fold_index>')
-        print('The configuration file must be in yaml format. K indicates which k-fold interation has to be generated. K is only needed if k-fold is activated')
-        sys.exit(2)
-    for opt, arg in opts:
-        if opt == '-h':
-            print(file_name, '-c <configfile> -k <k_fold_index>')
-            print('The configuration file must be in yaml format. K indicates which k-fold interation has to be generated. K is only needed if k-fold is activated')
-            sys.exit()
-        elif opt in ("-c", "--cfile"):
-            config_path = arg
-        elif opt in ("-k", "--kindex"):
-            k_index = arg
-
-    if config_path == None:
-        print(file_name, '-c <configfile> -k <k_fold_index>')
-        print('The configuration file must be in yaml format. K indicates which k-fold interation has to be generated. K is only needed if k-fold is activated')
-        sys.exit(2)
-
-    return config_path, int(k_index)
+    parser = argparse.ArgumentParser(
+        prog=file_path,
+        description=(
+            "The configuration file must be in YAML format. "
+            "K indicates which k-fold iteration to generate and is only needed if k-fold is activated."
+        )
+    )
+    parser.add_argument('-c', '--cfile', required=True, help='Path to the configuration file.')
+    parser.add_argument('-k', '--kindex', required=True, type=int, help='K-fold index (an integer).')
+    
+    args = parser.parse_args(argv)
+    return args.cfile, args.kindex
 
 
 
 if __name__ == "__main__":
     config_path, fold_index = parse_inputs(sys.argv[0], sys.argv[1:])
-    
+
     with open(config_path) as yaml_file:
         annotations_config = yaml.safe_load(yaml_file)
 
@@ -209,9 +201,11 @@ if __name__ == "__main__":
         else:
             test_files.append(img_path)
 
-    print('Train Images: '+str(len(train_files)), 
-        'Validation Images: '+str(len(val_files)),
-        'Test Images: '+str(len(test_files)))
+    print(
+        f'Train Images: {len(train_files)}',
+        f'Validation Images: {len(val_files)}',
+        f'Test Images: {len(test_files)}',
+    )
 
     datasets_dictionary = {
         'datasets' : {},
@@ -241,32 +235,28 @@ if __name__ == "__main__":
                 'key': key,
                 'shape':[],
                 'ids':[],
+                'boxes':{},
+                'polygons':{},
                 'ppes':{},
-                'types':{}
+                'types':{},
+                'strings':{}
             }
 
     coco_train = convert_all(train_files, annotations, datasets_dictionary)
-    with open(output_path + 'train.json', "w") as outfile: 
+    with open(f'{output_path}train.json', "w") as outfile: 
         json.dump(coco_train, outfile, indent=2)
 
     coco_val = convert_all(val_files, annotations, datasets_dictionary)
-    with open(output_path + 'val.json', "w") as outfile: 
+    with open(f'{output_path}val.json', "w") as outfile: 
         json.dump(coco_val, outfile, indent=2)
 
     coco_test = convert_all(test_files, annotations, datasets_dictionary)
-    with open(output_path + 'test.json', "w") as outfile: 
+    with open(f'{output_path}test.json', "w") as outfile: 
         json.dump(coco_test, outfile, indent=2)
 
     datasets_dictionary['categories'] = coco_train['categories']
 
-    with open(output_path + 'datasets_info.json', "w") as outfile: 
+    with open(f'{output_path}datasets_info.json', "w") as outfile: 
         json.dump(datasets_dictionary, outfile, indent=2)
-
-
-
-
-
-
-
 
 

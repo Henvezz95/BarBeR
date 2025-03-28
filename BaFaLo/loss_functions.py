@@ -4,18 +4,29 @@ import torchvision
 import sys
 sys.path.append('./python')
 
-from typing import List
-from torch import Tensor, einsum
+from torch import Tensor
 
-class DefaultLoss(nn.Module):
-    def __init__(self, gamma=2.0, alpha=0.25):
-        super(DefaultLoss, self).__init__()
+class FocalLoss(nn.Module):
+    def __init__(self, gamma=2.0, alpha=0.5):
+        super(FocalLoss, self).__init__()
         self.gamma = gamma
         self.alpha = alpha
     
     def forward(self, predictions, ground_truth):
         # Detection Loss
         return torchvision.ops.sigmoid_focal_loss(predictions, ground_truth, alpha = self.alpha, gamma = self.gamma, reduction='mean')
+    
+class FocalLoss_weighted(nn.Module):
+    def __init__(self, gamma=2.0, alpha=0.5):
+        super(FocalLoss_weighted, self).__init__()
+        self.gamma = gamma
+        self.alpha = alpha
+    
+    def forward(self, predictions, ground_truth):
+        # Detection Loss
+        mapp = torchvision.ops.sigmoid_focal_loss(predictions, ground_truth[:, 1:], alpha = self.alpha, gamma = self.gamma, reduction='none')
+        mapp = mapp*ground_truth[:, 0:1]
+        return torch.mean(mapp)
     
 class WeightedLoss(nn.Module):
     def __init__(self, w1=10, w2=50, gamma=2.0, alpha=0.25):

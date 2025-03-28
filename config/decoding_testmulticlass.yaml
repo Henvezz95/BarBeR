@@ -1,0 +1,144 @@
+coco_annotations_path: ./annotations/COCO/
+longest_edge_resize: 1280
+num_threads: 1
+define: &device 'cpu'
+down_ratio: &ratio 4.0
+
+algorithms:
+- preloc_args:
+    imgsz: 320
+    model_path: ./Saved Models/yolon_320_4.pt
+    device: *device
+  reader_args:
+    padding: 20
+    down_ratio: *ratio
+    scales: [0.25, 1.0]
+  loc_type: 'detect'
+  class: YOLO_detector
+  library: ultralytics_detector
+  name: Yolo Nano
+
+- preloc_args:
+    model_path: ./Saved Models/fscnn_0.25x_192-448_4.pt
+    minArea: 300
+    th: 0.4
+    activation: sigmoid
+    gray_scale: false
+    remove_first_channel: false
+    device: *device
+  reader_args:
+    padding: 20
+    down_ratio: *ratio
+    scales: [0.25, 1.0]
+  loc_type: 'detect'
+  class: Pytorch_segmenter
+  library: pytorch_segmentation
+  name: FSCNN 0.25 Detect
+
+- preloc_args:
+    model_path: ./Saved Models/contextnet_0.25x_192-448_4.pt
+    minArea: 300
+    th: 0.4
+    activation: sigmoid
+    gray_scale: false
+    remove_first_channel: false
+    device: *device
+  reader_args:
+    padding: 20
+    down_ratio: *ratio
+    scales: [0.25, 1.0]
+  loc_type: 'detect'
+  class: Pytorch_segmenter
+  library: pytorch_segmentation
+  name: Contextnet 0.25 Detect
+
+
+- preloc_args:
+    model_path: ./Saved Models/bisenet_0.25x_192-448_4.pt
+    minArea: 300
+    th: 0.4
+    activation: sigmoid
+    gray_scale: false
+    remove_first_channel: false
+    device: *device
+  reader_args:
+    padding: 20
+    down_ratio: *ratio
+    scales: [0.25, 1.0]
+  loc_type: 'detect'
+  class: Pytorch_segmenter
+  library: pytorch_segmentation
+  name: BiseNet 0.25 Detect
+
+- preloc_args:
+    model_path: ./Saved Models/bisenet_0.125x_192-448_0.pt
+    minArea: 300
+    th: 0.4
+    activation: sigmoid
+    gray_scale: false
+    remove_first_channel: false
+    device: *device
+  reader_args:
+    padding: 20
+    down_ratio: *ratio
+    scales: [0.25, 1.0]
+  loc_type: 'detect'
+  class: Pytorch_segmenter
+  library: pytorch_segmentation
+  name: BiseNet 0.125 Detect
+
+
+- preloc_args:
+    model_path: ./Saved Models/bafalo_scnn_192-448_4.pt
+    minArea: 300
+    th: 0.4
+    activation: sigmoid
+    gray_scale: false
+    remove_first_channel: false
+    device: *device
+  reader_args:
+    padding: 20
+    down_ratio: *ratio
+    scales: [0.25,  1.0]
+
+  loc_type: 'detect'
+  class: Pytorch_segmenter
+  library: pytorch_segmentation
+  name: BaFaLo 2-scales
+
+- preloc_args:
+    model_path: ./Saved Models/zharkov_320_4.pt
+    minArea: 300
+    th: 0.4
+    device: *device
+  reader_args:
+    padding: 20
+    down_ratio: *ratio
+    scales: [0.25,  1.0]
+
+  loc_type: 'detect'
+  class: Zharkov_detector
+  library: zharkov_detector
+  name: Zharkov
+
+
+- preloc_args:
+    model_path: ./Saved Models/bafalo_scnn_192-448_4.pt
+    minArea: 300
+    th: 0.4
+    activation: sigmoid
+    gray_scale: false
+    remove_first_channel: false
+    device: *device
+  reader_args:
+    padding: 20
+    down_ratio: *ratio
+    scales: [0.25, 0.375, 0.5, 0.75, 1.0]
+
+  loc_type: 'detect'
+  class: Pytorch_segmenter
+  library: pytorch_segmentation
+  name: BaFaLo 5-scales
+
+  
+ 
