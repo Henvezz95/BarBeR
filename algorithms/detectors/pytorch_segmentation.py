@@ -9,7 +9,7 @@ from detectors_abs import BaseDetector
 sys.path.append('./python/') 
 sys.path.append('./BaFaLo/') 
 
-from utils.utility import get_contours_and_boxes, torch_load
+from utils.utility import get_contours_and_boxes
 from utils.activations import act_dict
 from utils.model_wrapper import ModelWrapper
 
@@ -47,7 +47,7 @@ class Pytorch_segmenter(BaseDetector):
         self.class_type = class_type
         self.min_input_size = min_input_size
         self.remove_first_channel = remove_first_channel
-        self.model = ModelWrapper(model = torch.load(model_path),
+        self.model = ModelWrapper(model = torch.load(model_path, weights_only=False),
                                   num_threads = num_threads,
                                   device = device,
                                   activation = activation)
