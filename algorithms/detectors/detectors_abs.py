@@ -1,9 +1,11 @@
 from abc import ABC, abstractmethod
 import numpy.typing as npt
+from typing import Union, List, Tuple
+import numpy.typing as npt
 
 class BaseDetector(ABC):
     @abstractmethod
-    def detect(self, img:npt.NDArray) -> tuple[list[npt.NDArray], list[str], list[float | int | None]]:
+    def detect(self, img: npt.NDArray) -> Tuple[List[npt.NDArray], List[str], List[Union[float, int, None]]]:
         '''
         The detect method operates on a single image, in numpy array format
         The detect method has 3 outputs:
@@ -14,6 +16,6 @@ class BaseDetector(ABC):
         pass
 
     @abstractmethod
-    def get_timing(self) -> int | float:
+    def get_timing(self) -> Union[int, float]:
         pass
         
