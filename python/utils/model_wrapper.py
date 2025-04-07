@@ -21,7 +21,7 @@ class ModelWrapper(torch.nn.Module):
         self.device = device
         self.activation = act_dict[activation]
         in_ch = get_first_conv_layer(model).in_channels
-        self.input_tensor = torch.randn(1, in_ch, 320, 320)
+        self.input_tensor = torch.randn(1, in_ch, 224,224)
         if device == 'cpu':
             self.model.to('cpu')
             self.activation.to('cpu')

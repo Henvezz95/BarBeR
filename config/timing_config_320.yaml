@@ -2,7 +2,6 @@ coco_annotations_path: ./annotations/COCO/
 define: &img_size 320
 longest_edge_resize: *img_size
 num_repeats: 3
-num_threads: 12
 step: 16
 define: &device 'cpu'
 define: &onnx true
@@ -26,7 +25,7 @@ algorithms:
 
 
 - args:
-    model_path: ./Saved Models/fscnn_0.25x_192-448_0.pt
+    model_path: ./Saved Models/fastscnn_0.5x_192-448_0.pt
     minArea: 300
     th: 0.4
     activation: sigmoid
@@ -34,10 +33,12 @@ algorithms:
     remove_first_channel: false
     device: *device
     onnx: *onnx
+    min_input_size: 224
     num_threads: *num_threads
   class: Pytorch_segmenter
   library: pytorch_segmentation
-  name: FSCNN 0.25x
+  name: FSCNN 0.5x
+
 
 - args:
     model_path: ./Saved Models/bisenet_0.25x_192-448_0.pt
@@ -52,6 +53,20 @@ algorithms:
   class: Pytorch_segmenter
   library: pytorch_segmentation
   name: Bisenet 0.25x
+
+- args:
+    model_path: ./Saved Models/bisenet_0.125x_192-448_0.pt
+    minArea: 300
+    th: 0.4
+    activation: sigmoid
+    gray_scale: false
+    remove_first_channel: false
+    device: *device
+    onnx: *onnx
+    num_threads: *num_threads
+  class: Pytorch_segmenter
+  library: pytorch_segmentation
+  name: Bisenet 0.125x
 
 - args:
     model_path: ./Saved Models/contextnet_0.25x_192-448_0.pt
@@ -80,6 +95,35 @@ algorithms:
   class: Pytorch_segmenter
   library: pytorch_segmentation
   name: BaFaLo SCNN
+
+- args:
+    model_path: ./Saved Models/bafalo_scnn_noshuffle_192-448_0.pt
+    minArea: 300
+    th: 0.4
+    activation: sigmoid
+    gray_scale: false
+    remove_first_channel: false
+    onnx: *onnx
+    num_threads: *num_threads
+    device: *device
+  class: Pytorch_segmenter
+  library: pytorch_segmentation
+  name: BaFaLo SCNN NoShuffle
+
+- args:
+    model_path: ./Saved Models/bafalo_scnn_ppm_192-448_0.pt
+    minArea: 300
+    th: 0.4
+    activation: sigmoid
+    gray_scale: false
+    remove_first_channel: false
+    min_input_size: 224
+    onnx: *onnx
+    num_threads: *num_threads
+    device: *device
+  class: Pytorch_segmenter
+  library: pytorch_segmentation
+  name: BaFaLo SCNN PPM
 
 - args:
     model_path: ./Saved Models/zharkov_320_0.pt

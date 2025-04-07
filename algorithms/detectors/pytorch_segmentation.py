@@ -31,7 +31,8 @@ class Pytorch_segmenter(BaseDetector):
                  activation = 'sigmoid',
                  remove_first_channel = False,
                  onnx = False,
-                 class_type = '1D'):
+                 class_type = '1D',
+                 min_input_size = 0):
         
         # First layer weights are scaled to operate in the range 0..255 instead of 0..1
         # This is done to increase the pre-processing speed
@@ -44,6 +45,7 @@ class Pytorch_segmenter(BaseDetector):
         self.timing = 0
         self.single_class = single_class
         self.class_type = class_type
+        self.min_input_size = min_input_size
         self.remove_first_channel = remove_first_channel
         self.model = ModelWrapper(model = torch.load(model_path),
                                   num_threads = num_threads,
@@ -54,9 +56,9 @@ class Pytorch_segmenter(BaseDetector):
 
 
     def _get_heatmap(self, img):
-        H,W,c = img.shape
-        a = int(np.ceil(H/32)*32)-H
-        b = int(np.ceil(W/32)*32)-W
+        H,W,_ = img.shape
+        a = max(int(np.ceil(H/32)*32), self.min_input_size ) - H
+        b = max(int(np.ceil(W/32)*32), self.min_input_size ) - W
         img = np.pad(img, ((0,a),(0,b),(0,0)))
         if self.gray_scale:
             img = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
