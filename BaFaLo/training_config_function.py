@@ -5,7 +5,7 @@ from torch import optim
 from loss_functions import FocalLoss
 
 from fast_scnn import FastSCNN, FastSCNN_0_5x, FastSCNN_0_25x
-from fast_scnn_pico import BaFaLo_SCNN, BaFaLo_SCNN_noshuffle
+from fast_scnn_pico import BaFaLo_SCNN, BaFaLo_SCNN_noshuffle, BaFaLo_SCNN_PPM
 from bisenetv2 import BiSeNetV2, BiSeNetV2_0_5x, BiSeNetV2_0_25x, BiSeNetV2_0_125x
 from contextnet import ContextNet_0_25x, ContextNet_0_5x, ContextNet
 
@@ -58,9 +58,9 @@ def get_training_config(network_type, num_epochs,  in_ch=3, n_classes=2, aux=Fal
     aux_weight = 0.4
     if network_type == 'fastscnn':
         model = FastSCNN(n_classes, in_ch, aux)
-    elif network_type == 'fast_scnn_0.5x':
+    elif network_type == 'fastscnn_0.5x':
         model = FastSCNN_0_5x(n_classes, in_ch, aux)
-    elif network_type == 'fast_scnn_0.25x':
+    elif network_type == 'fastscnn_0.25x':
         model = FastSCNN_0_25x(n_classes, in_ch, aux)
     elif network_type == 'bisenet':
         model = BiSeNetV2(n_classes, in_ch, aux)
@@ -82,6 +82,8 @@ def get_training_config(network_type, num_epochs,  in_ch=3, n_classes=2, aux=Fal
         model = ContextNet_0_25x(n_classes, in_ch)
     elif network_type == 'bafalo_noshuffle':
         model = BaFaLo_SCNN_noshuffle(n_classes, in_ch, mid_ch=32, aux=aux)
+    elif network_type == 'bafalo_ppm':
+        model = BaFaLo_SCNN_PPM(n_classes, in_ch, mid_ch=32, aux=aux)
     else:
         model = BaFaLo_SCNN(n_classes, in_ch, mid_ch=32, aux=aux)
     optimizer, scheduler = get_optimizer(network_type, model, num_epochs)
