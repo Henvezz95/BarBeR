@@ -40,6 +40,7 @@ The repository has been developed with Linux as the main target OS. However, it 
   - detectron2_detector.py: loads a Detectron2 model in .pt or .pth format and uses it for localization.
   - gallo_detector.py: runs the 1D barcode localization method proposed by Orazio Gallo and Roberto Manduchi in the 2011 paper ["Reading 1D Barcodes with Mobile Phones Using Deformable Templates"](https://pubmed.ncbi.nlm.nih.gov/21173448/).
   - pytorch_detector.py: loads a Pytorch detection model in .pt or .pth format and uses it for localization.
+  - pytorch_segmentation.py: loads a Pytorch segmentation model in .pt or .pth format and uses it for localization or segmentation of barcodes. Use this if you want to use a BaFaLo (Barcode Fast Localizer) model for localization or segmentation.
   - soros_detector.py: runs the 1D and 2D barcode localization method proposed by G. Sörös and C. Flörkemeier in the 2013 paper [Blur-resistant joint 1D and 2D barcode localization for smartphones](https://dl.acm.org/doi/10.1145/2541831.2541844).
   - tekin_detector.py: runs the 1D barcode localization method proposed by E. Tekin et al. in the 2013 paper ["S-K Smartphone Barcode Reader for the Blind"](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4288446/).
   - ultralytics_detector.py: loads an Ultralytics model (YOLO or RT-DETR supported) in .pt or .pth format and uses it for localization
@@ -58,7 +59,7 @@ The repository has been developed with Linux as the main target OS. However, it 
   - reports: are .yaml files generated after running a Python test
   - graphs: are .png files representing a graph generated using one or multiple .yaml reports
  
-* **BaFaLo**: Here are the necessary Python files to define the BaFaLo architecture in PyTorch and train it. In addition, it is possible to train the segmentation models used as comparison and the BaFaLo variations used in the ablation studies.
+* **BaFaLo**: Here are the necessary Python files to define the BaFaLo (Barcode Fast Localizer) architecture in PyTorch and train it. In addition, it is possible to train the segmentation models used as comparison and the BaFaLo variations used in the ablation studies.
  
 All other folders are needed to compile the necessary libraries when building the repository.
  
@@ -207,4 +208,3 @@ class NewDetector(BaseDetector):
 ```
 
 * To enable the new algorithm in a test, it should be added to the algorithms list in the configuration file used in the test. Check the available configuration files in the Repository for the exact syntax required
-* 
