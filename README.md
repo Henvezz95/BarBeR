@@ -28,7 +28,7 @@ Once unzipped, you will find 2 folders inside: "Annotations" and "dataset". If y
 <img src='./Examples.jpg' width='500'>
 
 # Saved Models
-One Saved Model for every architecture and scale can be downloaded from [here]([https://1drv.ms/f/s!AhGbwgwB_qwFgbA0hLye0PkUnmYkVA?e=JMAX5e](https://ditto.ing.unimore.it/barber/). Unzip the folder and place "Saved Models" directly inside the main repository folder.
+One Saved Model for every architecture and scale can be downloaded from [here](https://ditto.ing.unimore.it/barber/). Unzip the folder and place "Saved Models" directly inside the main repository folder.
 
 Additional segmentation models can be downloaded from [here](https://unimore365-my.sharepoint.com/:u:/g/personal/319554_unimore_it/EYz0mZdleahDoXHozIqgiF4BGUg-ppbonS3v9MVxd-FFcQ?e=2ug9O0). In the future, it will be possible to download everything from a single link.
 
