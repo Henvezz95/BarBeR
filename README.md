@@ -10,7 +10,7 @@ The repository contains multiple algorithms for 1D and 2D barcode localization p
 |------|-----------|-------|-------|
 | 2025 | **Vezzali _et_ _al._** “State-of-the-Art Review and Benchmarking of Barcode Localization Methods,” *Eng. Appl. of AI* | Complete description of the dataset, benchmarking tools, protocols, and an extensive method survey. **Primary reference.** | 📄 [Paper](https://www.sciencedirect.com/science/article/pii/S0952197625002593)|
 | 2024 | **Vezzali _et_ _al._** “BarBeR: A Barcode Benchmarking Repository,” *Proc. ICPR* | Original dataset introduction & baseline results. | 📄 [Paper](https://link.springer.com/chapter/10.1007/978-3-031-78447-7_13) |
-| 2024 | **Vezzali _et_ _al._** “BarBeR – Implementation and Reproducibility Notes,” *RRPR Workshop* | Step-by-step scripts, configs, and practical tips to reproduce our ICPR numbers on your hardware. | 📄 [PDF](https://iris.unimore.it/retrieve/daaf2bf0-5171-456e-bada-a273df0c6bb4/BarBeR___Barcode_Benchmark_Repository__Implementation_and_Reproducibility_Notes.pdf)|
+| 2024 | **Vezzali _et_ _al._** “BarBeR – Implementation and Reproducibility Notes,” *RRPR Workshop* | Step-by-step scripts, configs, and practical tips to reproduce our ICPR numbers on your hardware. | 📄 [Paper](https://iris.unimore.it/retrieve/daaf2bf0-5171-456e-bada-a273df0c6bb4/BarBeR___Barcode_Benchmark_Repository__Implementation_and_Reproducibility_Notes.pdf)|
 
 > *Need the exact BibTeX?*&nbsp;See the **[How to Cite BarBeR](#how-to-cite-barber)** section at the end of this README.
 
