@@ -8,16 +8,16 @@ The repository contains multiple algorithms for 1D and 2D barcode localization p
 
 | Year | Reference | Focus | Links |
 |------|-----------|-------|-------|
-| 2025 | **Vezzali _etal._** “State-of-the-Art Review and Benchmarking of Barcode Localization Methods,” *Eng. Appl. of AI* | Complete description of the dataset, benchmarking tools, protocols, and an extensive method survey. **Primary reference.** | 📄 [Paper](https://www.sciencedirect.com/science/article/pii/S0952197625002593) • 🔖 [Jump to citation](#how-to-cite-barber) |
-| 2024 | **Vezzali _etal._** “BarBeR: A Barcode Benchmarking Repository,” *Proc. ICPR* | Original dataset introduction & baseline results. | 📄 [Paper](https://link.springer.com/chapter/10.1007/978-3-031-78447-7_13) • 🔖 [Jump to citation](#how-to-cite-barber) |
-| 2024 | **Vezzali _etal._** “BarBeR – Implementation and Reproducibility Notes,” *RRPR Workshop* | Step-by-step scripts, configs, and practical tips to reproduce our ICPR numbers on your hardware. | 📄 [PDF](https://iris.unimore.it/retrieve/daaf2bf0-5171-456e-bada-a273df0c6bb4/BarBeR___Barcode_Benchmark_Repository__Implementation_and_Reproducibility_Notes.pdf) • 🔖 [Jump to citation](#how-to-cite-barber) |
+| 2025 | **Vezzali _et_al._** “State-of-the-Art Review and Benchmarking of Barcode Localization Methods,” *Eng. Appl. of AI* | Complete description of the dataset, benchmarking tools, protocols, and an extensive method survey. **Primary reference.** | 📄 [Paper](https://www.sciencedirect.com/science/article/pii/S0952197625002593)|
+| 2024 | **Vezzali _et_al._** “BarBeR: A Barcode Benchmarking Repository,” *Proc. ICPR* | Original dataset introduction & baseline results. | 📄 [Paper](https://link.springer.com/chapter/10.1007/978-3-031-78447-7_13) |
+| 2024 | **Vezzali _et_al._** “BarBeR – Implementation and Reproducibility Notes,” *RRPR Workshop* | Step-by-step scripts, configs, and practical tips to reproduce our ICPR numbers on your hardware. | 📄 [PDF](https://iris.unimore.it/retrieve/daaf2bf0-5171-456e-bada-a273df0c6bb4/BarBeR___Barcode_Benchmark_Repository__Implementation_and_Reproducibility_Notes.pdf)|
 
 > *Need the exact BibTeX?*&nbsp;See the **[How to Cite BarBeR](#how-to-cite-barber)** section at the end of this README.
 
 # Installation Instructions
-To build the libraries you first need to install:
+To build the libraries, you first need to install:
 - OpenCV for C++ (v4) and OpenCV-contrib (Instructions [here](https://docs.opencv.org/4.x/d7/d9f/tutorial_linux_install.html)) 
-- Install Boost with the following command: sudo apt -y install libboost-filesystem-dev (ubuntu). For windows, follow [these instructions](https://robots.uc3m.es/installation-guides/install-boost.html#install-boost-ubuntu).
+- Install Boost with the following command: sudo apt -y install libboost-filesystem-dev (Ubuntu). For Windows, follow [these instructions](https://robots.uc3m.es/installation-guides/install-boost.html#install-boost-ubuntu).
 
 Then, you can build the repository using CMake:
 ```
