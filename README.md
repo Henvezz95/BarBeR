@@ -207,3 +207,38 @@ class NewDetector(BaseDetector):
 ```
 
 * To enable the new algorithm in a test, it should be added to the algorithms list in the configuration file used in the test. Check the available configuration files in the Repository for the exact syntax required
+* 
+
+---
+
+## How to Cite BarBeR
+
+If you use the BarBeR dataset, benchmark tools, or pretrained models, please cite **at least the journal article** listed below.  
+When space allows, we kindly encourage citing **both** publications, as they reflect complementary aspects of the project:
+
+| Paper | When to cite |
+| ----- | ------------ |
+| **Vezzali et al., 2025 – _Engineering Applications of Artificial Intelligence_ (Elsevier)** | The most complete and up-to-date description of the dataset, benchmark tools, evaluation protocols, and a thorough review of barcode localization methods. Use this as the **primary citation**. |
+| **Vezzali et al., 2024 – _ICPR_** | The original introduction of the BarBeR dataset and benchmark, including baseline results. Consider citing this **in addition** when discussing dataset construction or reproducing the original experiments. |
+
+### BibTeX
+
+```bibtex
+@article{Vezzali2025EAAI,
+  title     = {State-of-the-art Review and Benchmarking of Barcode Localization Methods},
+  author    = {Enrico Vezzali and Federico Bolelli and Stefano Santi and Costantino Grana},
+  journal   = {Engineering Applications of Artificial Intelligence},
+  year      = {2025},
+  volume    = {XXX},
+  pages     = {1--29},
+  doi       = {10.1016/j.engappai.2025.XXXXX}
+}
+
+@inproceedings{Vezzali2024ICPR,
+  title     = {{BarBeR}: A Barcode Benchmarking Repository},
+  author    = {Enrico Vezzali and Federico Bolelli and Stefano Santi and Costantino Grana},
+  booktitle = {Proc.\ 26th International Conference on Pattern Recognition (ICPR)},
+  year      = {2024},
+  pages     = {187--203},
+  doi       = {10.1109/ICPR56621.2024.00XYZ}
+}
