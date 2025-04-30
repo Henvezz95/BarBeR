@@ -139,7 +139,7 @@ source scripts/k_fold_test_multiclass.sh
 ```
 
 # Testing a New Localization Algorithm
-* The localization method must be defined inside a new Python file (e.g. ```new_algorithm.py```) and the file must be placed inside the ```algorithms``` folder
+* The localization method must be defined inside a new Python file (e.g. ```new_algorithm.py```) and the file must be placed inside the ```algorithms/detectors``` folder
 * Define a class with the implementation of the algorithm. To ensure compatibility, the new class should inherit from the abstract class "BaseDetector" defined in ```algorithms/detectors_abs.py```
 * A detector must have at least these two methods: detect and get_timing
 * **detect works** on a single image and outputs a list of detected bounding boxes, a list with the classes of the detections, and a list of confidence scores (between 0 and 1 if available, otherwise None)
