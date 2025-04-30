@@ -23,15 +23,17 @@ pip install -r requirements.txt
 
 # Download the Dataset
 The dataset can be downloaded from this [Link](https://ditto.ing.unimore.it/barber/).
-Once Unzipped, you will find 2 folders inside: "Annotations" and "dataset". If you place these two folders directly inside the BarBeR folder there is no need to change the paths of the configuration files.
+Once unzipped, you will find 2 folders inside: "Annotations" and "dataset". If you place these two folders directly inside the BarBeR folder, there is no need to change the paths of the configuration files. From the same link is also possible to download the pre-trained detection models.
 
 <img src='./Examples.jpg' width='500'>
 
 # Saved Models
-One Saved Model for every architecture and scale can be downloaded from [here](https://1drv.ms/f/s!AhGbwgwB_qwFgbA0hLye0PkUnmYkVA?e=JMAX5e). Unzip the folder and place "Saved Models" directly inside the main repository folder.
+One Saved Model for every architecture and scale can be downloaded from [here]([https://1drv.ms/f/s!AhGbwgwB_qwFgbA0hLye0PkUnmYkVA?e=JMAX5e](https://ditto.ing.unimore.it/barber/). Unzip the folder and place "Saved Models" directly inside the main repository folder.
+
+Additional segmentation models can be downloaded from [here](https://unimore365-my.sharepoint.com/:u:/g/personal/319554_unimore_it/EYz0mZdleahDoXHozIqgiF4BGUg-ppbonS3v9MVxd-FFcQ?e=2ug9O0). In the future, it will be possible to download everything from a single link.
 
 # Compatibility
-The repository has been developed with Linux as the main target OS. However, it should be possible to build the project also on Windows. The code is not architecture-specific and it's possible to build and run all the tests on different architectures. Both x86-64 and ARM architectures have been tested without any reported issues.
+The repository has been developed with Linux as the main target OS. However, it should be possible to build the project also on Windows. The code is not architecture-specific, and it's possible to build and run all the tests on different architectures. Both x86-64 and ARM architectures have been tested without any reported issues.
 
 # Folders
 * **algorithms/detectors**: Contains a Python class for every localization algorithm available. In particular, the available classes are:
