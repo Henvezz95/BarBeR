@@ -4,16 +4,6 @@ The repository contains multiple algorithms for 1D and 2D barcode localization p
 
 <img src='./logo_with_name.png'>
 
-## Publications & Reproducibility
-
-| Year | Reference | Focus | Links |
-|------|-----------|-------|-------|
-| 2025 | **Vezzali _et_ _al._** “State-of-the-Art Review and Benchmarking of Barcode Localization Methods,” *Eng. Appl. of AI* | Complete description of the dataset, benchmarking tools, protocols, and an extensive method survey. **Primary reference.** | 📄 [Paper](https://www.sciencedirect.com/science/article/pii/S0952197625002593)|
-| 2024 | **Vezzali _et_ _al._** “BarBeR: A Barcode Benchmarking Repository,” *Proc. ICPR* | Original dataset introduction & baseline results. | 📄 [Paper](https://link.springer.com/chapter/10.1007/978-3-031-78447-7_13) |
-| 2024 | **Vezzali _et_ _al._** “BarBeR – Implementation and Reproducibility Notes,” *RRPR Workshop* | Step-by-step scripts, configs, and practical tips to reproduce our ICPR numbers on your hardware. | 📄 [Paper](https://iris.unimore.it/retrieve/daaf2bf0-5171-456e-bada-a273df0c6bb4/BarBeR___Barcode_Benchmark_Repository__Implementation_and_Reproducibility_Notes.pdf)|
-
-> *Need the exact BibTeX?*&nbsp;See the **[How to Cite BarBeR](#how-to-cite-barber)** section at the end of this README.
-
 # Installation Instructions
 To build the libraries, you first need to install:
 - OpenCV for C++ (v4) and OpenCV-contrib (Instructions [here](https://docs.opencv.org/4.x/d7/d9f/tutorial_linux_install.html)) 
@@ -218,37 +208,3 @@ class NewDetector(BaseDetector):
 
 * To enable the new algorithm in a test, it should be added to the algorithms list in the configuration file used in the test. Check the available configuration files in the Repository for the exact syntax required
 * 
-
----
-
-## How to Cite BarBeR
-
-If you use the BarBeR dataset, benchmark tools, or pretrained models, please cite **at least the journal article** listed below.  
-When space allows, we kindly encourage citing **both** publications, as they reflect complementary aspects of the project:
-
-| Paper | When to cite |
-| ----- | ------------ |
-| **Vezzali, Enrico, et al. "State-of-the-art review and benchmarking of barcode localization methods." Engineering Applications of Artificial Intelligence** | The most complete and up-to-date description of the dataset, benchmark tools, evaluation protocols, and a thorough review of barcode localization methods. Use this as the **primary citation**. |
-| **Vezzali, Enrico, et al. "Barber: A barcode benchmarking repository." International Conference on Pattern Recognition. Springer, Cham, 2025.** | The original introduction of the BarBeR dataset and benchmark, including baseline results. Consider citing this **in addition** when discussing dataset construction or reproducing the original experiments. |
-
-### BibTeX
-
-```bibtex
-@article{vezzali2025state,
-  author    = {Vezzali, Enrico and Bolelli, Federico and Santi, Stefano and Grana, Costantino},
-  title     = {{State-of-the-art Review and Benchmarking of Barcode Localization Methods}},
-  journal   = {{Engineering Applications of Artificial Intelligence}},
-  year      = {2025},
-  volume    = {},
-  pages     = {1--29},
-  issn      = {0952-1976}
-}
-
-@inproceedings{vezzali2024barber,
-  title={Barber: A barcode benchmarking repository},
-  author={Vezzali, Enrico and Bolelli, Federico and Santi, Stefano and Grana, Costantino},
-  booktitle={International Conference on Pattern Recognition},
-  pages={187--203},
-  year={2025},
-  organization={Springer}
-}
