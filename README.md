@@ -126,7 +126,7 @@ python3 python/time_benchmark.py   -c ./config/timing_config.yaml   -o ./results
 ### Decoding‑Rate Test
 
 End‑to‑end evaluation of **detection → cropping → decoding** using `pyzbar`.  
-Reports the percentage of images where at least one barcode is successfully decoded.
+Reports the percentage of barcodes successfully decoded, divided by category (1D *or* 2D).
 
 | Script | `python/test_decodings.py` |
 | --- | --- |
