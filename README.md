@@ -1,5 +1,5 @@
-# BarBeR: Barcode Benchmark Repository
-The repository contains multiple algorithms for 1D and 2D barcode localization proposed in different papers in the past years. The repository contains the tools to measure the performance of those algorithms
+# Complete Benchmark
+The repository contains multiple algorithms for 1D and 2D barcode localization proposed in different papers over the past years. The repository contains the tools to measure the performance of those algorithms
 
 
 <img src='./logo_with_name.png'>
