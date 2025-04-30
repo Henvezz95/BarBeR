@@ -22,7 +22,7 @@ pip install -r requirements.txt
 ```
 
 # Download the Dataset
-The dataset can be downloaded from this [Link](https://unimore365-my.sharepoint.com/:f:/g/personal/319554_unimore_it/EpO-JIoN9HlJlvLBB4cZhREBTTiScfGMg6t1s68ifrtHMQ?e=gRHz0T).
+The dataset can be downloaded from this [Link](https://ditto.ing.unimore.it/barber/).
 Once Unzipped, you will find 2 folders inside: "Annotations" and "dataset". If you place these two folders directly inside the BarBeR folder there is no need to change the paths of the configuration files.
 
 <img src='./Examples.jpg' width='500'>
