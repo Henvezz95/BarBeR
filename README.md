@@ -13,7 +13,7 @@ cd build
 cmake ..
 cmake --build .
 ```
-To install all required Python libraries run this command:
+To install all required Python libraries, run this command:
 ```
 pip install -r requirements.txt
 ```
@@ -27,7 +27,7 @@ Once unzipped, you will find 2 folders inside: "Annotations" and "dataset". If y
 # Saved Models
 One Saved Model for every architecture and scale can be downloaded from [here](https://ditto.ing.unimore.it/barber/). Unzip the folder and place "Saved Models" directly inside the main repository folder.
 
-Additional segmentation models can be downloaded from [here](https://unimore365-my.sharepoint.com/:u:/g/personal/319554_unimore_it/EYz0mZdleahDoXHozIqgiF4BGUg-ppbonS3v9MVxd-FFcQ?e=2ug9O0). In the future, it will be possible to download everything from a single link.
+Additional segmentation models (including BaFaLo, Fast SCNN, ContextNet, and Bisenet V2) can be downloaded from [here](https://unimore365-my.sharepoint.com/:u:/g/personal/319554_unimore_it/EYz0mZdleahDoXHozIqgiF4BGUg-ppbonS3v9MVxd-FFcQ?e=2ug9O0). In the future, it will be possible to download everything from a single link.
 
 # Compatibility
 The repository has been developed with Linux as the main target OS. However, it should be possible to build the project also on Windows. The code is not architecture-specific, and it's possible to build and run all the tests on different architectures. Both x86-64 and ARM architectures have been tested without any reported issues.
