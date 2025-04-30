@@ -146,7 +146,7 @@ source scripts/k_fold_test_multiclass.sh
 * **get_timing** returns the processing time of the last detection in milliseconds. The use of ```perf_counter_ns``` is advised, because it has a [high resolution](https://peps.python.org/pep-0564/#annex-clocks-resolution-in-python) (around 100ns) on both Linux and Windows. The output of ```perf_counter_ns``` should then be divided by 1e6.
   
  ```python
-# Defining the new class inside algorithms/new_algorithm.py
+# Defining the new class inside algorithms/detectors/new_algorithm.py
 from detectors_abs import BaseDetector
 
 class NewDetector(BaseDetector):
