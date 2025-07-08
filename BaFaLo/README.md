@@ -1,2 +1,2 @@
 # BaFaLo
-![BaFaLo Logo](BaFalo - Logo.png)
+![BaFaLo Logo](./BaFalo-Logo.png)
