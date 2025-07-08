@@ -44,7 +44,6 @@ def parse_inputs(file_path, argv):
     return config_path, output_path
 
 
-# TODO Rename this here and in `parse_inputs`
 def _extracted_from_parse_inputs(file_name):
     print(file_name, '-c <configfile> -o <trained_model_output_path>')
     print('The configuration file must be in yaml format, the output path does not need an extension, it will be added automatically depending on the format')
@@ -158,8 +157,8 @@ if __name__ == "__main__":
                     voutputs = model(vinputs.cuda())
                     if isinstance(voutputs, (tuple, list)):
                         vloss = loss_fc(voutputs[0], vlabels.cuda())
-                        #for i in range(1, len(voutputs)):
-                        #    vloss += loss_fc(voutputs[i], vlabels.cuda())*0.2
+                        for i in range(1, len(voutputs)):
+                            vloss += loss_fc(voutputs[i], vlabels.cuda())*aux_weight
                     else:
                         vloss = loss_fc(voutputs, vlabels.cuda())
                 else:
