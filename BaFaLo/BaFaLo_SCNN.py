@@ -1,5 +1,5 @@
-"""Fast Segmentation Convolutional Neural Network"""
-import os
+"""Barcode Fast Localizer"""
+
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -9,7 +9,7 @@ __all__ = ['FastSCNN', 'get_fast_scnn']
 
 
 class BaFaLo_SCNN(nn.Module):
-    def __init__(self, num_classes, in_ch=1, mid_ch=32, aux=False, **kwargs):
+    def __init__(self, num_classes, in_ch=3, mid_ch=32, aux=False, **kwargs):
         super(BaFaLo_SCNN, self).__init__()
         self.aux = aux
         self.learning_to_downsample = LearningToDownsample(in_ch, 12, 24, 32)
@@ -43,7 +43,7 @@ class BaFaLo_SCNN(nn.Module):
         return outputs
     
 class BaFaLo_SCNN_noshuffle(nn.Module):
-    def __init__(self, num_classes, in_ch=1, mid_ch=32, aux=False, **kwargs):
+    def __init__(self, num_classes, in_ch=3, mid_ch=32, aux=False, **kwargs):
         super(BaFaLo_SCNN_noshuffle, self).__init__()
         self.aux = aux
         self.learning_to_downsample = LearningToDownsample(in_ch, 12, 24, 32)
@@ -74,7 +74,7 @@ class BaFaLo_SCNN_noshuffle(nn.Module):
         return outputs
 
 class BaFaLo_SCNN_PPM(nn.Module):
-    def __init__(self, num_classes, in_ch=1, mid_ch=32, aux=False, **kwargs):
+    def __init__(self, num_classes, in_ch=3, mid_ch=32, aux=False, **kwargs):
         super(BaFaLo_SCNN_PPM, self).__init__()
         self.aux = aux
         self.learning_to_downsample = LearningToDownsample(in_ch, 12, 24, 32)
