@@ -5,6 +5,7 @@ The repository contains multiple algorithms for 1D and 2D barcode localization p
 <img src='./logo_with_name.png'>
 
 ## Publications & Reproducibility
+> *Are you searching for BaFaLo, our proposed method for fast segmentation of barcodes?*&nbsp;Check it out **[Here](./BaFaLo)** !.
 
 | Year | Reference | Focus | Links |
 |------|-----------|-------|-------|
