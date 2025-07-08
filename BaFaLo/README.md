@@ -1,14 +1,14 @@
 # BaFaLo: Barcode Fast Localizer
 
-![BaFaLo Logo](./BaFalo-Logo.png) > **Official implementation of the CAIP 2025 paper "A Deep-Learning-Based Method for Real-Time Barcode Segmentation on Edge CPUs".**
+![BaFaLo Logo](./BaFalo-Logo.png) 
 
-**BaFaLo (Barcode Fast Localizer)** is an ultra-lightweight neural network for barcode localization and segmentation[cite: 313, 494]. [cite_start]It is specifically designed and optimized for real-time performance on low-power edge CPUs, eliminating the need for dedicated hardware accelerators[cite: 312, 314, 337]. [cite_start]The model features a two-branch architecture with a local feature extractor and a global context module, tailored for low-resolution inputs to maximize inference speed while maintaining high accuracy for both 1D and 2D barcodes.
+> **Official implementation of the CAIP 2025 paper "A Deep-Learning-Based Method for Real-Time Barcode Segmentation on Edge CPUs".**
+
+**BaFaLo (Barcode Fast Localizer)** is an ultra-lightweight neural network for barcode localization and segmentation. It is specifically designed and optimized for real-time performance on low-power edge CPUs, eliminating the need for dedicated hardware accelerators. The model features a two-branch architecture with a local feature extractor and a global context module, tailored for low-resolution inputs to maximize inference speed while maintaining high accuracy for both 1D and 2D barcodes.
 
 ## 🏛️ Architecture
 
 The model is inspired by Fast-SCNN but is heavily streamlined for our use case. It consists of four main modules: a Learning to Downsample module, a Coarse Feature Extractor, a Feature Fusion module, and a Classifier that uses a pixel shuffle operation for high-quality upsampling.
-
-![BaFaLo Architecture](./architecture_diagram.png) *Architecture of the proposed model. [cite_start]DWConv stands for depthwise convolution, PWConv for pointwise convolution, and DSConv for depthwise separable convolution.*
 
 ## ✨ Key Features
 
