@@ -218,13 +218,12 @@ class NewDetector(BaseDetector):
 ```
 
 * To enable the new algorithm in a test, it should be added to the algorithms list in the configuration file used in the test. Check the available configuration files in the Repository for the exact syntax required
-* 
 
 ---
 
 ## How to Cite BarBeR
 
-If you use the BarBeR dataset, benchmark tools, or pretrained models, please cite **at least the journal article** listed below.  
+If you use the BarBeR dataset, benchmark tools, or pre-trained models, please cite **at least the journal article** listed below.  
 When space allows, we kindly encourage citing **both** publications, as they reflect complementary aspects of the project:
 
 | Paper | When to cite |
