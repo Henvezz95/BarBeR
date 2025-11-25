@@ -1,7 +1,7 @@
 IMAGE_SIZE=320
 echo "Image size: ${IMAGE_SIZE}"
 
-for (( i=4; i<=4; i++ ))
+for (( i=0; i<=4; i++ ))
 do
     echo $i
     python3 python/generate_coco_annotations.py -c ./config/generate_coco_annotations_config.yaml  -k $i
